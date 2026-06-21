@@ -3,11 +3,15 @@
 Captain Georgia — Daily East Coast Maritime Weather Report Generator
 Fetches live NWS + NHC data and builds a self-contained HTML file.
 Runs via GitHub Actions every morning at 0300 EDT (0700 UTC).
+Uses official NWS JSON API (api.weather.gov) — no HTML scraping.
 """
 
 import urllib.request
+import urllib.error
+import json
 import re
 import sys
+import time
 from datetime import datetime, timezone, timedelta
 
 EDT = timezone(timedelta(hours=-4))
@@ -17,89 +21,171 @@ VALID_THRU = (now + timedelta(hours=48)).strftime("%A, %B %-d, %Y")
 
 # ── helpers ──────────────────────────────────────────────────────────────────
 
-def fetch(url):
+HEADERS = {
+    "User-Agent": "CaptainGeorgia-WeatherBot/1.0 (captaingeorgia.com)",
+    "Accept": "application/geo+json, application/json"
+}
+
+def fetch_text(url):
     try:
-        req = urllib.request.Request(url, headers={"User-Agent": "CaptainGeorgia-WeatherBot/1.0"})
-        with urllib.request.urlopen(req, timeout=15) as r:
+        req = urllib.request.Request(url, headers=HEADERS)
+        with urllib.request.urlopen(req, timeout=20) as r:
             return r.read().decode("utf-8", errors="replace")
     except Exception as e:
-        print(f"  WARN: could not fetch {url}: {e}", file=sys.stderr)
+        print(f"  WARN: fetch_text {url}: {e}", file=sys.stderr)
         return ""
 
-def scrape_nws(html):
-    """Extract current conditions + forecast periods from NWS MapClick page."""
-    data = {"temp": "N/A", "conditions": "N/A", "humidity": "N/A",
-            "wind": "N/A", "visibility": "N/A", "heat_index": "", "periods": []}
-    # current temp
-    m = re.search(r'<p class="myforecast-current-lrg">([\d]+)&deg;F</p>', html)
-    if m: data["temp"] = m.group(1) + "°F"
-    # conditions
-    m = re.search(r'<p class="myforecast-current">([^<]+)</p>', html)
-    if m: data["conditions"] = m.group(1).strip()
-    # detail rows
-    rows = re.findall(r'<td[^>]*>\s*([^<\s][^<]*?)\s*</td>\s*<td[^>]*>\s*([^<\s][^<]*?)\s*</td>', html)
-    for label, val in rows:
-        label_l = label.strip().lower()
-        val_s = re.sub(r'<[^>]+>', '', val).strip()
-        if "humidity" in label_l: data["humidity"] = val_s
-        elif "wind" in label_l and "direction" not in label_l and "chill" not in label_l and "gust" not in label_l: data["wind"] = val_s
-        elif "visibility" in label_l: data["visibility"] = val_s
-        elif "heat index" in label_l: data["heat_index"] = val_s
-    # forecast periods
-    names = re.findall(r'<b>([^<]+)</b>', html)
-    temps = re.findall(r'(\d+)&deg;F', html)
-    descs = re.findall(r'<div title="([^"]{15,})"', html)
-    for i, name in enumerate(names[:10]):
-        if name in ("Forecast", "Humidity", "Wind Speed", "Barometer", "Dewpoint",
-                    "Visibility", "Last update", "More Information"):
-            continue
-        temp = temps[i] + "°F" if i < len(temps) else ""
-        desc = descs[i] if i < len(descs) else ""
-        data["periods"].append({"name": name, "temp": temp, "desc": desc})
+def fetch_json(url, retries=3):
+    for attempt in range(retries):
+        try:
+            req = urllib.request.Request(url, headers=HEADERS)
+            with urllib.request.urlopen(req, timeout=20) as r:
+                return json.loads(r.read().decode("utf-8"))
+        except Exception as e:
+            print(f"  WARN: fetch_json attempt {attempt+1} {url}: {e}", file=sys.stderr)
+            if attempt < retries - 1:
+                time.sleep(2)
+    return None
+
+def deg_to_compass(deg):
+    if deg is None:
+        return "N/A"
+    dirs = ["N","NNE","NE","ENE","E","ESE","SE","SSE","S","SSW","SW","WSW","W","WNW","NW","NNW"]
+    return dirs[round(float(deg) / 22.5) % 16]
+
+def c_to_f(c):
+    if c is None:
+        return None
+    return round(float(c) * 9 / 5 + 32)
+
+def ms_to_kt(ms):
+    if ms is None:
+        return None
+    return round(float(ms) * 1.94384)
+
+def ms_to_mph(ms):
+    if ms is None:
+        return None
+    return round(float(ms) * 2.23694)
+
+def m_to_mi(m):
+    if m is None:
+        return None
+    return round(float(m) / 1609.34, 1)
+
+# ── NWS API data fetcher ──────────────────────────────────────────────────────
+
+def fetch_nws_api(lat, lon, station_code):
+    """Fetch current observations + 48-hr forecast via NWS JSON API."""
+    data = {
+        "temp": "N/A", "conditions": "N/A", "humidity": "N/A",
+        "wind": "N/A", "visibility": "N/A", "heat_index": "", "periods": []
+    }
+
+    # ── Current observations ──────────────────────────────────────────────────
+    obs_url = f"https://api.weather.gov/stations/{station_code}/observations/latest"
+    obs = fetch_json(obs_url)
+    if obs and "properties" in obs:
+        props = obs["properties"]
+
+        temp_c = (props.get("temperature") or {}).get("value")
+        temp_f = c_to_f(temp_c)
+        if temp_f is not None:
+            data["temp"] = f"{temp_f}°F"
+
+        data["conditions"] = props.get("textDescription") or "N/A"
+
+        hum = (props.get("relativeHumidity") or {}).get("value")
+        if hum is not None:
+            data["humidity"] = f"{round(float(hum))}%"
+
+        wspd = (props.get("windSpeed") or {}).get("value")
+        wdir = (props.get("windDirection") or {}).get("value")
+        gust = (props.get("windGust") or {}).get("value")
+        if wspd is not None:
+            kt = ms_to_kt(wspd)
+            mph = ms_to_mph(wspd)
+            compass = deg_to_compass(wdir)
+            gust_str = f" G{ms_to_kt(gust)}kt" if gust else ""
+            data["wind"] = f"{compass} {kt}kt ({mph}mph){gust_str}"
+
+        vis = (props.get("visibility") or {}).get("value")
+        if vis is not None:
+            data["visibility"] = f"{m_to_mi(vis)} mi"
+
+        hi_c = (props.get("heatIndex") or {}).get("value")
+        hi_f = c_to_f(hi_c)
+        if hi_f is not None:
+            data["heat_index"] = f"{hi_f}°F"
+
+    # ── Forecast periods ──────────────────────────────────────────────────────
+    points_url = f"https://api.weather.gov/points/{lat},{lon}"
+    points = fetch_json(points_url)
+    if points and "properties" in points:
+        forecast_url = points["properties"].get("forecast")
+        if forecast_url:
+            time.sleep(0.3)   # be polite to the API
+            forecast = fetch_json(forecast_url)
+            if forecast and "properties" in forecast:
+                for period in (forecast["properties"].get("periods") or [])[:10]:
+                    name = period.get("name", "")
+                    temp = f"{period.get('temperature', '')}°{period.get('temperatureUnit', 'F')}"
+                    short = period.get("shortForecast", "")
+                    detail = period.get("detailedForecast", "")
+                    wind_spd = period.get("windSpeed", "")
+                    wind_dir = period.get("windDirection", "")
+                    wind_str = f" · Wind {wind_dir} {wind_spd}" if wind_spd else ""
+                    desc = f"{short}{wind_str}"
+                    if detail:
+                        desc = detail[:200]
+                    data["periods"].append({"name": name, "temp": temp, "desc": desc})
+
     return data
 
+# ── Coastal Waters + NHC ──────────────────────────────────────────────────────
+
 def fetch_cwf(site):
-    """Fetch Coastal Waters Forecast text."""
-    url = f"https://forecast.weather.gov/product.php?site={site}&issuedby={site}&product=CWF&format=txt&version=1"
-    html = fetch(url)
+    """Fetch Coastal Waters Forecast text product."""
+    url = (f"https://forecast.weather.gov/product.php"
+           f"?site={site}&issuedby={site}&product=CWF&format=txt&version=1")
+    html = fetch_text(url)
     m = re.search(r'<pre[^>]*>(.*?)</pre>', html, re.DOTALL)
     return m.group(1).strip() if m else ""
 
 def fetch_nhc_two():
-    html = fetch("https://www.nhc.noaa.gov/text/MIATWOAT.shtml")
+    """Fetch NHC Atlantic Tropical Weather Outlook."""
+    html = fetch_text("https://www.nhc.noaa.gov/text/MIATWOAT.shtml")
     m = re.search(r'<pre[^>]*>(.*?)</pre>', html, re.DOTALL)
     if m:
-        txt = re.sub(r'<[^>]+>', '', m.group(1)).strip()
-        return txt
-    return "No data available."
+        return re.sub(r'<[^>]+>', '', m.group(1)).strip()
+    return "Tropical Weather Outlook data unavailable. Visit nhc.noaa.gov for current status."
 
 def fetch_gulf_stream():
-    """Extract Gulf Stream position from MFL CWF."""
+    """Extract Gulf Stream position lines from MFL Coastal Waters Forecast."""
     cwf = fetch_cwf("MFL")
-    m = re.search(r'Gulf Stream.*?(?=\$\$)', cwf, re.DOTALL)
+    m = re.search(r'Gulf Stream.*?(?=\$\$)', cwf, re.DOTALL | re.IGNORECASE)
     if m:
-        lines = [l.strip() for l in m.group(0).split('\n') if l.strip()]
-        return lines
+        return [l.strip() for l in m.group(0).split('\n') if l.strip()]
     return []
 
-# ── city data ─────────────────────────────────────────────────────────────────
+# ── City definitions ──────────────────────────────────────────────────────────
 
 CITIES = [
-    {"name": "Portland",       "state": "MAINE",          "code": "KPWM", "lat": "43.6591", "lon": "-70.2568", "site": "GYX", "lat_d": "43.6°N"},
-    {"name": "Boston",         "state": "MASSACHUSETTS",  "code": "KBOS", "lat": "42.3601", "lon": "-71.0589", "site": "BOX", "lat_d": "42.4°N"},
-    {"name": "New York",       "state": "NEW YORK",       "code": "KJFK", "lat": "40.6413", "lon": "-73.7781", "site": "OKX", "lat_d": "40.6°N"},
-    {"name": "Norfolk",        "state": "VIRGINIA",       "code": "KORF", "lat": "36.9076", "lon": "-76.0179", "site": "AKQ", "lat_d": "36.9°N"},
-    {"name": "Charleston",     "state": "SOUTH CAROLINA", "code": "KCHS", "lat": "32.8986", "lon": "-80.0407", "site": "CHS", "lat_d": "32.9°N"},
-    {"name": "Jacksonville",   "state": "FLORIDA",        "code": "KNIP", "lat": "30.3322", "lon": "-81.6557", "site": "JAX", "lat_d": "30.2°N"},
-    {"name": "Fort Lauderdale","state": "FLORIDA",        "code": "KFXE", "lat": "26.1224", "lon": "-80.1373", "site": "MFL", "lat_d": "26.1°N"},
-    {"name": "Miami",          "state": "FLORIDA",        "code": "KMIA", "lat": "25.7617", "lon": "-80.1918", "site": "MFL", "lat_d": "25.8°N"},
+    {"name": "Portland",        "state": "MAINE",          "code": "KPWM", "lat": "43.6591", "lon": "-70.2568", "site": "GYX", "lat_d": "43.6°N"},
+    {"name": "Boston",          "state": "MASSACHUSETTS",  "code": "KBOS", "lat": "42.3601", "lon": "-71.0589", "site": "BOX", "lat_d": "42.4°N"},
+    {"name": "New York",        "state": "NEW YORK",       "code": "KJFK", "lat": "40.6413", "lon": "-73.7781", "site": "OKX", "lat_d": "40.6°N"},
+    {"name": "Norfolk",         "state": "VIRGINIA",       "code": "KORF", "lat": "36.9076", "lon": "-76.0179", "site": "AKQ", "lat_d": "36.9°N"},
+    {"name": "Charleston",      "state": "SOUTH CAROLINA", "code": "KCHS", "lat": "32.8986", "lon": "-80.0407", "site": "CHS", "lat_d": "32.9°N"},
+    {"name": "Jacksonville",    "state": "FLORIDA",        "code": "KNIP", "lat": "30.3322", "lon": "-81.6557", "site": "JAX", "lat_d": "30.2°N"},
+    {"name": "Fort Lauderdale", "state": "FLORIDA",        "code": "KFXE", "lat": "26.1224", "lon": "-80.1373", "site": "MFL", "lat_d": "26.1°N"},
+    {"name": "Miami",           "state": "FLORIDA",        "code": "KMIA", "lat": "25.7617", "lon": "-80.1918", "site": "MFL", "lat_d": "25.8°N"},
 ]
 
 REGIONS = [
-    ("northeast",  "🧭 Northeast",   "Maine · Massachusetts",           ["Portland", "Boston"]),
-    ("midatlantic","🌊 Mid-Atlantic", "New York · Virginia",             ["New York", "Norfolk"]),
-    ("southeast",  "🌴 Southeast",   "South Carolina",                  ["Charleston"]),
-    ("florida",    "🌴 Florida",     "Jacksonville · Fort Lauderdale · Miami", ["Jacksonville", "Fort Lauderdale", "Miami"]),
+    ("northeast",   "🧭 Northeast",   "Maine · Massachusetts",                        ["Portland", "Boston"]),
+    ("midatlantic", "🌊 Mid-Atlantic", "New York · Virginia",                          ["New York", "Norfolk"]),
+    ("southeast",   "🌴 Southeast",   "South Carolina",                               ["Charleston"]),
+    ("florida",     "🌴 Florida",     "Jacksonville · Fort Lauderdale · Miami",        ["Jacksonville", "Fort Lauderdale", "Miami"]),
 ]
 
 # ── HTML builder ──────────────────────────────────────────────────────────────
@@ -108,7 +194,8 @@ def period_html(p):
     name = p.get("name", "")
     temp = p.get("temp", "")
     desc = p.get("desc", "")
-    temp_cls = "temp-hi" if any(x in name.lower() for x in ["afternoon","day","monday","tuesday","wednesday","thursday","friday","saturday","sunday"]) else "temp-lo"
+    day_kws = ["afternoon","day","monday","tuesday","wednesday","thursday","friday","saturday","sunday","today","tonight"]
+    temp_cls = "temp-hi" if any(x in name.lower() for x in day_kws) else "temp-lo"
     return f"""
       <div class="period">
         <div class="period-name">{name}</div>
@@ -117,9 +204,14 @@ def period_html(p):
       </div>"""
 
 def city_card_html(city, data):
-    periods = "".join(period_html(p) for p in data["periods"][:5])
-    nws_url = f"https://forecast.weather.gov/MapClick.php?CityName={city['name'].replace(' ','+')}&state={city['state'].split()[0]}&site={city['site']}&textField1={city['lat']}&textField2={city['lon']}"
-    hi_badge = f'<span class="heat">&nbsp;HI {data["heat_index"]}&nbsp;</span>' if data["heat_index"] else ""
+    periods = "".join(period_html(p) for p in data["periods"][:6])
+    nws_url = (f"https://forecast.weather.gov/MapClick.php"
+               f"?CityName={city['name'].replace(' ','+')}"
+               f"&state={city['state'].split()[0]}"
+               f"&site={city['site']}"
+               f"&textField1={city['lat']}&textField2={city['lon']}")
+    hi_badge = (f'<span class="heat">&nbsp;HI {data["heat_index"]}&nbsp;</span>'
+                if data["heat_index"] else "")
     home_badge = ' · Home Port' if city["name"] == "Fort Lauderdale" else ""
     return f"""
   <div class="city-card">
@@ -134,6 +226,7 @@ def city_card_html(city, data):
       </div>
     </div>
     <div class="current-row">
+      <div class="curr-item">🌤 {data['conditions']}</div>
       <div class="curr-item">💧 Humidity: <span>{data['humidity']}</span></div>
       <div class="curr-item">💨 Wind: <span>{data['wind']}</span></div>
       <div class="curr-item">👁 Vis: <span>{data['visibility']}</span></div>
@@ -141,7 +234,7 @@ def city_card_html(city, data):
     </div>
     <div class="forecast-list">
       <h4>48-Hour Forecast (NWS {city['site']})</h4>
-      {periods}
+      {periods if periods else '<p style="color:var(--muted);font-size:0.82rem;">Forecast data temporarily unavailable — visit NWS for full forecast.</p>'}
     </div>
     <div class="card-footer">
       <span>NWS {city['site']} · {city['code']}</span>
@@ -206,8 +299,6 @@ main{max-width:1280px;margin:0 auto;padding:16px 20px 40px;}
 .temp-hi{color:#dc2626;font-weight:700;}
 .temp-lo{color:#2563eb;font-weight:700;}
 .period-desc{color:var(--text);}
-.precip{background:#dbeafe;color:#1e40af;font-size:0.72rem;font-weight:700;padding:1px 6px;border-radius:10px;}
-.precip-high{background:#fee2e2;color:#dc2626;}
 .card-footer{display:flex;justify-content:space-between;align-items:center;padding:8px 14px;background:#f8fafc;border-top:1px solid var(--border);font-size:0.75rem;color:var(--muted);}
 .card-footer a{color:var(--teal);font-weight:600;text-decoration:none;}
 .mariner-box{background:linear-gradient(135deg,var(--navy) 0%,#1a3a5c 100%);color:#fff;border-radius:12px;padding:24px 28px;margin-top:28px;}
@@ -226,17 +317,9 @@ main{max-width:1280px;margin:0 auto;padding:16px 20px 40px;}
 .status-card.info .status-title{color:var(--teal);}
 .status-value{font-size:1.35rem;font-weight:700;color:var(--text);line-height:1.2;margin-bottom:4px;}
 .status-sub{font-size:0.79rem;color:var(--muted);line-height:1.5;}
-.offshore-table{width:100%;border-collapse:collapse;font-size:0.82rem;background:var(--card);border-radius:10px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,0.07);margin-bottom:20px;}
-.offshore-table th{background:var(--navy);color:#fff;padding:10px 12px;text-align:left;font-size:0.76rem;text-transform:uppercase;letter-spacing:0.4px;}
-.offshore-table td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:top;line-height:1.45;}
-.offshore-table tr:last-child td{border-bottom:none;}
-.offshore-table tr:nth-child(even) td{background:#f8fafc;}
-.zone-name{font-weight:700;color:var(--navy);}
-.zone-sub{font-size:0.74rem;color:var(--muted);}
-.sea-state{display:inline-block;padding:2px 8px;border-radius:12px;font-size:0.77rem;font-weight:700;}
-.sea-calm{background:#dcfce7;color:#15803d;}
-.sea-moderate{background:#fef9c3;color:#a16207;}
-.sea-rough{background:#fee2e2;color:#dc2626;}
+.nhc-block{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:20px 24px;margin-bottom:20px;box-shadow:0 1px 4px rgba(0,0,0,0.07);}
+.nhc-block h2{font-size:1.1rem;color:var(--navy);margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid var(--teal);}
+.nhc-text{font-size:0.87rem;font-family:monospace;white-space:pre-wrap;color:var(--text);line-height:1.7;max-height:400px;overflow-y:auto;}
 .gulf-stream-box{background:linear-gradient(135deg,#0a1f3a 0%,#0c6682 100%);color:#fff;border-radius:10px;padding:18px 22px;margin-bottom:20px;display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:start;}
 .gs-icon{font-size:2.4rem;}
 .gs-title{font-size:0.77rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#7dd3fc;margin-bottom:6px;}
@@ -253,13 +336,16 @@ footer strong{color:#fff;}
 def build_html(city_data, nhc_two, gs_lines):
     today_str = now.strftime("%A, %B %-d")
 
-    # Build city sections
+    # City sections
     sections_html = ""
     for region_id, region_label, region_title, city_names in REGIONS:
         cards = ""
         for cn in city_names:
             city = next(c for c in CITIES if c["name"] == cn)
-            d = city_data.get(cn, {"temp":"N/A","conditions":"N/A","humidity":"N/A","wind":"N/A","visibility":"N/A","heat_index":"","periods":[]})
+            d = city_data.get(cn, {
+                "temp": "N/A", "conditions": "N/A", "humidity": "N/A",
+                "wind": "N/A", "visibility": "N/A", "heat_index": "", "periods": []
+            })
             cards += city_card_html(city, d)
         sections_html += f"""
 <div class="section-header" id="{region_id}">
@@ -272,14 +358,18 @@ def build_html(city_data, nhc_two, gs_lines):
 
     # Gulf Stream positions
     gs_pos_html = ""
-    for line in gs_lines[2:6] if len(gs_lines) > 2 else []:
+    for line in (gs_lines[2:6] if len(gs_lines) > 2 else []):
         parts = line.strip().split(" of ")
         if len(parts) == 2:
-            gs_pos_html += f'<div class="gs-pos"><strong>{parts[1].strip()}</strong>{parts[0].strip()}</div>'
+            gs_pos_html += (f'<div class="gs-pos">'
+                            f'<strong>{parts[1].strip()}</strong>'
+                            f'{parts[0].strip()}</div>')
+    if not gs_pos_html:
+        gs_pos_html = ('<div class="gs-pos"><strong>Off Port Everglades</strong>~19 nm SE (typical)</div>'
+                       '<div class="gs-pos"><strong>Off Jupiter Inlet</strong>~17 nm E (typical)</div>')
 
-    # NHC summary (first 3 lines of actual text)
-    nhc_clean = re.sub(r'\s+', ' ', re.sub(r'<[^>]+>', '', nhc_two)).strip()
-    nhc_summary = nhc_clean[:300] if nhc_clean else "No data available."
+    # NHC full text
+    nhc_display = nhc_two if nhc_two else "Tropical Weather Outlook data unavailable."
 
     return f"""<!DOCTYPE html>
 <html lang="en">
@@ -343,13 +433,13 @@ def build_html(city_data, nhc_two, gs_lines):
 <div class="overview-card">
   <h2>🗺️ Regional Overview — Next 48 Hours · Generated {today_str} at 03:00 EDT</h2>
   <div class="overview-grid">
-    <div class="overview-item"><div class="ov-region">🧭 Maine / New England</div><div class="ov-summary">Live NWS data — see Portland forecast below.</div></div>
-    <div class="overview-item"><div class="ov-region">⛈ Massachusetts / Boston</div><div class="ov-summary">Live NWS data — see Boston forecast below.</div></div>
-    <div class="overview-item"><div class="ov-region">🌊 New York / NJ Coast</div><div class="ov-summary">Live NWS data — see New York forecast below.</div></div>
-    <div class="overview-item"><div class="ov-region">🌡 Virginia / Hampton Roads</div><div class="ov-summary">Live NWS data — see Norfolk forecast below.</div></div>
-    <div class="overview-item"><div class="ov-region">☀️ South Carolina</div><div class="ov-summary">Live NWS data — see Charleston forecast below.</div></div>
-    <div class="overview-item"><div class="ov-region">⛈ Northeast Florida</div><div class="ov-summary">Live NWS data — see Jacksonville forecast below.</div></div>
-    <div class="overview-item"><div class="ov-region">🌤 South Florida</div><div class="ov-summary">Live NWS data — see Fort Lauderdale &amp; Miami below.</div></div>
+    <div class="overview-item"><div class="ov-region">🧭 Maine / New England</div><div class="ov-summary">Live NWS API data — see Portland forecast below.</div></div>
+    <div class="overview-item"><div class="ov-region">⛈ Massachusetts / Boston</div><div class="ov-summary">Live NWS API data — see Boston forecast below.</div></div>
+    <div class="overview-item"><div class="ov-region">🌊 New York / NJ Coast</div><div class="ov-summary">Live NWS API data — see New York forecast below.</div></div>
+    <div class="overview-item"><div class="ov-region">🌡 Virginia / Hampton Roads</div><div class="ov-summary">Live NWS API data — see Norfolk forecast below.</div></div>
+    <div class="overview-item"><div class="ov-region">☀️ South Carolina</div><div class="ov-summary">Live NWS API data — see Charleston forecast below.</div></div>
+    <div class="overview-item"><div class="ov-region">⛈ Northeast Florida</div><div class="ov-summary">Live NWS API data — see Jacksonville forecast below.</div></div>
+    <div class="overview-item"><div class="ov-region">🌤 South Florida</div><div class="ov-summary">Live NWS API data — see Fort Lauderdale &amp; Miami below.</div></div>
   </div>
 </div>
 
@@ -365,28 +455,28 @@ def build_html(city_data, nhc_two, gs_lines):
 <div class="status-grid">
   <div class="status-card all-clear">
     <div class="status-title">🌀 Atlantic Tropics Status</div>
-    <div class="status-value">SEE BELOW</div>
-    <div class="status-sub">NHC Tropical Weather Outlook — current as of 03:00 EDT today</div>
+    <div class="status-value">SEE NHC BELOW</div>
+    <div class="status-sub">NHC Tropical Weather Outlook — current as of {ISSUE_TIME}</div>
   </div>
   <div class="status-card info">
     <div class="status-title">🌊 Gulf Stream</div>
     <div class="status-value">NORMAL</div>
-    <div class="status-sub">No Gulf Stream hazards posted · Position data from Naval Oceanographic Office</div>
+    <div class="status-sub">Position data from NWS Miami (MFL) Coastal Waters Forecast</div>
   </div>
 </div>
 
-<div class="overview-card">
+<div class="nhc-block">
   <h2>🌀 NHC Atlantic Tropical Weather Outlook</h2>
-  <p style="font-size:0.88rem; white-space:pre-wrap; font-family:monospace; color:var(--text);">{nhc_summary}</p>
-  <p style="font-size:0.77rem; color:var(--muted); margin-top:8px;">Source: <a href="https://www.nhc.noaa.gov/text/MIATWOAT.shtml" target="_blank">NHC — nhc.noaa.gov</a></p>
+  <div class="nhc-text">{nhc_display}</div>
+  <p style="font-size:0.77rem;color:var(--muted);margin-top:10px;">Source: <a href="https://www.nhc.noaa.gov/text/MIATWOAT.shtml" target="_blank">NHC — nhc.noaa.gov</a></p>
 </div>
 
 <div class="gulf-stream-box">
   <div class="gs-icon">🌊</div>
   <div>
-    <div class="gs-title">Gulf Stream — West Wall Position · Source: Naval Oceanographic Office via NWS Miami</div>
-    <p style="font-size:0.87rem; margin-bottom:8px; color:#e2e8f0;">The Gulf Stream west wall marks the inshore boundary of the northward-flowing current (avg 2–4 kt). <strong style="color:#7dd3fc;">No Gulf Stream hazards currently posted.</strong></p>
-    <div class="gs-positions">{gs_pos_html if gs_pos_html else '<div class="gs-pos"><strong>Off Port Everglades</strong>~19 nm SE (typical)</div><div class="gs-pos"><strong>Off Jupiter Inlet</strong>~17 nm E (typical)</div>'}</div>
+    <div class="gs-title">Gulf Stream — West Wall Position · Source: NWS Miami (MFL) Coastal Waters Forecast</div>
+    <p style="font-size:0.87rem;margin-bottom:8px;color:#e2e8f0;">The Gulf Stream west wall marks the inshore boundary of the northward-flowing current (avg 2–4 kt). <strong style="color:#7dd3fc;">No Gulf Stream hazards currently posted.</strong></p>
+    <div class="gs-positions">{gs_pos_html}</div>
     <div class="gs-warn">⚠ Winds opposing the Gulf Stream current create steep, confused seas. Avoid strong north winds while transiting. Stream averages 2–4 kt northward flow in this region.</div>
   </div>
 </div>
@@ -435,13 +525,12 @@ def build_html(city_data, nhc_two, gs_lines):
 # ── main ──────────────────────────────────────────────────────────────────────
 
 def main():
-    print("Fetching NWS city forecasts...", file=sys.stderr)
+    print("Fetching NWS city data via JSON API...", file=sys.stderr)
     city_data = {}
     for city in CITIES:
-        print(f"  {city['name']}...", file=sys.stderr)
-        url = f"https://forecast.weather.gov/MapClick.php?CityName={city['name'].replace(' ','+')}&state={city['state'].split()[0]}&site={city['site']}&textField1={city['lat']}&textField2={city['lon']}"
-        html = fetch(url)
-        city_data[city["name"]] = scrape_nws(html)
+        print(f"  {city['name']} ({city['code']})...", file=sys.stderr)
+        city_data[city["name"]] = fetch_nws_api(city["lat"], city["lon"], city["code"])
+        time.sleep(0.5)   # polite rate limiting
 
     print("Fetching NHC Tropical Weather Outlook...", file=sys.stderr)
     nhc_two = fetch_nhc_two()
