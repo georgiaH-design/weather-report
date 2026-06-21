@@ -104,6 +104,18 @@ def fetch_buoy_full(buoy_id):
     if not cur:
         return result
 
+    # For wave data, scan up to 12 most recent rows for the first non-MM reading
+    wave_row = None
+    for line in lines[:12]:
+        row = parse_row(line)
+        if row and row["wvht"] is not None:
+            wave_row = row
+            break
+    if wave_row:
+        cur["wvht"] = wave_row["wvht"]
+        cur["dpd"]  = wave_row.get("dpd")
+        cur["mwd"]  = wave_row.get("mwd")
+
     # Wave height + sea state
     if cur["wvht"]:
         try:
@@ -259,7 +271,7 @@ def fetch_gulf_stream():
 CITIES = [
     {"name": "Portland",        "state": "MAINE",          "code": "KPWM", "lat": "43.6591", "lon": "-70.2568", "site": "GYX", "lat_d": "43.6°N", "buoy": "44007"},
     {"name": "Boston",          "state": "MASSACHUSETTS",  "code": "KBOS", "lat": "42.3601", "lon": "-71.0589", "site": "BOX", "lat_d": "42.4°N", "buoy": "44013"},
-    {"name": "Newport",         "state": "RHODE ISLAND",   "code": "KUUU", "lat": "41.5321", "lon": "-71.2815", "site": "BOX", "lat_d": "41.5°N", "buoy": "44017"},
+    {"name": "Newport",         "state": "RHODE ISLAND",   "code": "KUUU", "lat": "41.5321", "lon": "-71.2815", "site": "BOX", "lat_d": "41.5°N", "buoy": "44008"},
     {"name": "New York",        "state": "NEW YORK",       "code": "KJFK", "lat": "40.6413", "lon": "-73.7781", "site": "OKX", "lat_d": "40.6°N", "buoy": "44025"},
     {"name": "Chesapeake Bay",  "state": "MARYLAND",       "code": "KNHK", "lat": "38.2840", "lon": "-76.4110", "site": "LWX", "lat_d": "38.3°N", "buoy": "CHLV2"},
     {"name": "Norfolk",         "state": "VIRGINIA",       "code": "KORF", "lat": "36.9076", "lon": "-76.0179", "site": "AKQ", "lat_d": "36.9°N", "buoy": "44014"},
