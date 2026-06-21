@@ -34,29 +34,3 @@ jobs:
           git diff --staged --quiet || git commit -m "Daily weather report — $(date -u '+%Y-%m-%d %H:%M UTC')"
           git push
 
-      - name: Post to Facebook Page
-        env:
-          FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
-          FB_PAGE_ACCESS_TOKEN: ${{ secrets.FB_PAGE_ACCESS_TOKEN }}
-        run: |
-          python3 - <<'EOF'
-          import urllib.request, urllib.parse, os, datetime
-          date_str = datetime.datetime.utcnow().strftime("%B %-d, %Y")
-          message = (
-              f"\U0001f30a 48-Hour East Coast Maritime Weather Forecast — {date_str}\n\n"
-              "Your daily briefing covering offshore conditions, wind & sea state, "
-              "Gulf Stream position, and tropical activity from Maine to Miami.\n\n"
-              "\U0001f4e1 Live NOAA/NWS/NHC data — updated every morning at 0300.\n\n"
-              "\U0001f517 Full report: https://georgiah-design.github.io/weather-report/\n\n"
-              "#MaritimeWeather #EastCoast #CaptainGeorgia #Offshore #Sailing #Boating"
-          )
-          page_id = os.environ["FB_PAGE_ID"]
-          token = os.environ["FB_PAGE_ACCESS_TOKEN"]
-          data = urllib.parse.urlencode({"message": message, "access_token": token}).encode()
-          req = urllib.request.Request(
-              f"https://graph.facebook.com/v20.0/{page_id}/feed",
-              data=data, method="POST"
-          )
-          with urllib.request.urlopen(req) as r:
-              print("Facebook post response:", r.read().decode())
-          EOF
