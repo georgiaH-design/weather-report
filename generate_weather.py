@@ -73,29 +73,91 @@ def m_to_mi(m):
         return None
     return round(float(m) / 1609.34, 1)
 
-# ── NDBC wave height fetcher ─────────────────────────────────────────────────
+# ── NDBC buoy full data fetcher ──────────────────────────────────────────────
 
-def fetch_wave_height(buoy_id):
-    """Fetch significant wave height from NDBC buoy realtime data."""
+def fetch_buoy_full(buoy_id):
+    """Fetch full obs from NDBC buoy: waves, wind, water temp, pressure, trend."""
     url = f"https://www.ndbc.noaa.gov/data/realtime2/{buoy_id}.txt"
     text = fetch_text(url)
+    result = {
+        "wvht": "N/A", "dpd": "N/A", "mwd": "N/A", "wspd": "N/A",
+        "wtmp": "N/A", "pres": "N/A",
+        "sea_label": "N/A", "sea_cls": "sea-calm",
+        "trend": "→", "trend_label": "Steady", "trend_cls": "trend-steady"
+    }
     if not text:
-        return "N/A"
+        return result
     lines = [l for l in text.strip().split('\n') if not l.startswith('#')]
     if not lines:
-        return "N/A"
-    parts = lines[0].split()
-    if len(parts) < 9:
-        return "N/A"
-    wvht = parts[8]  # WVHT column = significant wave height in meters
-    if wvht == 'MM':
-        return "N/A"
-    try:
-        wvht_m = float(wvht)
-        wvht_ft = round(wvht_m * 3.28084, 1)
-        return f"{wvht_ft} ft ({wvht_m:.1f} m)"
-    except Exception:
-        return "N/A"
+        return result
+
+    def parse_row(row):
+        p = row.split()
+        if len(p) < 15:
+            return None
+        def v(x): return None if x == 'MM' else x
+        return {"wvht": v(p[8]), "dpd": v(p[9]), "mwd": v(p[11]),
+                "wspd": v(p[6]), "wdir": v(p[5]), "gust": v(p[7]),
+                "pres": v(p[12]), "wtmp": v(p[14])}
+
+    cur = parse_row(lines[0])
+    if not cur:
+        return result
+
+    # Wave height + sea state
+    if cur["wvht"]:
+        try:
+            wm = float(cur["wvht"])
+            wf = round(wm * 3.28084, 1)
+            result["wvht"] = f"{wf} ft"
+            if wf < 2:   result["sea_label"], result["sea_cls"] = "CALM",       "sea-calm"
+            elif wf < 4: result["sea_label"], result["sea_cls"] = "SLIGHT",     "sea-calm"
+            elif wf < 8: result["sea_label"], result["sea_cls"] = "MODERATE",   "sea-moderate"
+            elif wf < 13:result["sea_label"], result["sea_cls"] = "ROUGH",      "sea-rough"
+            else:        result["sea_label"], result["sea_cls"] = "VERY ROUGH", "sea-very-rough"
+
+            # Trend vs ~12 hrs ago
+            if len(lines) > 12:
+                past = parse_row(lines[12])
+                if past and past["wvht"]:
+                    diff = wm - float(past["wvht"])
+                    if diff > 0.3:
+                        result["trend"], result["trend_label"], result["trend_cls"] = "↑", "Building",  "trend-up"
+                    elif diff < -0.3:
+                        result["trend"], result["trend_label"], result["trend_cls"] = "↓", "Subsiding", "trend-down"
+        except Exception:
+            pass
+
+    # Period
+    if cur["dpd"]:
+        try: result["dpd"] = f"{round(float(cur['dpd']))} sec"
+        except: pass
+
+    # Wave direction
+    if cur["mwd"]:
+        try: result["mwd"] = f"{deg_to_compass(cur['mwd'])} {round(float(cur['mwd']))}°"
+        except: pass
+
+    # Wind
+    if cur["wspd"]:
+        try:
+            kt = ms_to_kt(cur["wspd"])
+            compass = deg_to_compass(cur["wdir"])
+            gust_str = f" G{ms_to_kt(cur['gust'])}kt" if cur.get("gust") else ""
+            result["wspd"] = f"{compass} {kt}kt{gust_str}"
+        except: pass
+
+    # Water temp
+    if cur["wtmp"]:
+        try: result["wtmp"] = f"{c_to_f(cur['wtmp'])}°F"
+        except: pass
+
+    # Pressure
+    if cur["pres"]:
+        try: result["pres"] = f"{round(float(cur['pres']))} mb"
+        except: pass
+
+    return result
 
 # ── NWS API data fetcher ──────────────────────────────────────────────────────
 
@@ -359,7 +421,26 @@ main{max-width:1280px;margin:0 auto;padding:16px 20px 40px;}
 footer{background:var(--navy);color:#93c5fd;text-align:center;padding:20px;font-size:0.8rem;margin-top:32px;}
 footer a{color:#7dd3fc;}
 footer strong{color:#fff;}
-@media(max-width:600px){.city-grid{grid-template-columns:1fr;}.header-top{flex-direction:column;gap:8px;text-align:center;}}
+.buoy-table{width:100%;border-collapse:collapse;background:var(--card);border-radius:10px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,0.07);font-size:0.84rem;margin-bottom:8px;}
+.buoy-table thead tr{background:linear-gradient(90deg,#0a2540,#0c5c7a);}
+.buoy-table th{color:#bae6fd;font-size:0.70rem;text-transform:uppercase;letter-spacing:0.6px;padding:8px 12px;text-align:left;font-weight:700;white-space:nowrap;}
+.buoy-table td{padding:6px 12px;border-bottom:1px solid #f1f5f9;vertical-align:middle;white-space:nowrap;}
+.buoy-table tr:last-child td{border-bottom:none;}
+.buoy-table tr:nth-child(even) td{background:#f8fafc;}
+.buoy-table .grp-row td{background:#0a3d5c;color:#7dd3fc;font-size:0.68rem;font-weight:700;letter-spacing:1px;padding:3px 12px;text-transform:uppercase;}
+.bloc{font-weight:700;color:var(--navy);font-size:0.84rem;}
+.bid{font-size:0.70rem;color:var(--muted);}
+.bwv{font-weight:800;color:#0e7490;font-size:0.92rem;}
+.sea-calm{background:#dcfce7;color:#15803d;}
+.sea-moderate{background:#fef9c3;color:#a16207;}
+.sea-rough{background:#fee2e2;color:#dc2626;}
+.sea-very-rough{background:#7f1d1d;color:#fecaca;}
+.bsea{display:inline-block;padding:2px 8px;border-radius:8px;font-size:0.68rem;font-weight:700;}
+.trend-up{color:#dc2626;font-weight:700;}
+.trend-down{color:#15803d;font-weight:700;}
+.trend-steady{color:#64748b;font-weight:700;}
+.ndbc-lnk{color:var(--teal);text-decoration:none;font-size:0.70rem;font-weight:600;}
+@media(max-width:600px){.city-grid{grid-template-columns:1fr;}.header-top{flex-direction:column;gap:8px;text-align:center;}.buoy-table{font-size:0.72rem;}}
 """
 
 OVERVIEW_REGIONS = [
@@ -389,7 +470,60 @@ def overview_item(icon, label, city_names, city_data):
     body = "<br><br>".join(lines)
     return f'<div class="overview-item"><div class="ov-region">{icon} {label}</div><div class="ov-summary">{body}</div></div>'
 
-def build_html(city_data, nhc_two, gs_lines):
+BUOY_REGIONS = [
+    ("🧭 Northeast",    ["Portland", "Boston", "Newport"]),
+    ("🌊 Mid-Atlantic", ["New York", "Chesapeake Bay", "Norfolk"]),
+    ("🌴 Southeast",    ["Outer Banks", "Charleston", "Jacksonville"]),
+    ("🌴 Florida",      ["Fort Lauderdale", "Miami", "Key West"]),
+]
+
+def build_buoy_table(buoy_data):
+    city_map = {c["name"]: c for c in CITIES}
+    rows = ""
+    for region_label, names in BUOY_REGIONS:
+        rows += f'<tr class="grp-row"><td colspan="10">{region_label}</td></tr>\n'
+        for cn in names:
+            bd = buoy_data.get(cn, {})
+            city = city_map.get(cn, {})
+            buoy_id = city.get("buoy", "")
+            ndbc_url = f"https://www.ndbc.noaa.gov/station_page.php?station={buoy_id}"
+            sea_label = bd.get("sea_label", "N/A")
+            sea_cls   = bd.get("sea_cls", "sea-calm")
+            t_arrow   = bd.get("trend", "→")
+            t_label   = bd.get("trend_label", "Steady")
+            t_cls     = bd.get("trend_cls", "trend-steady")
+            rows += f"""<tr>
+  <td><div class="bloc">{cn}</div></td>
+  <td><div class="bid">{buoy_id}</div></td>
+  <td class="bwv">{bd.get("wvht","N/A")}</td>
+  <td>{bd.get("dpd","N/A")}</td>
+  <td>{bd.get("mwd","N/A")}</td>
+  <td>{bd.get("wspd","N/A")}</td>
+  <td>{bd.get("wtmp","N/A")}</td>
+  <td>{bd.get("pres","N/A")}</td>
+  <td><span class="bsea {sea_cls}">{sea_label}</span></td>
+  <td><span class="{t_cls}">{t_arrow} {t_label}</span></td>
+  <td><a class="ndbc-lnk" href="{ndbc_url}" target="_blank">↗</a></td>
+</tr>"""
+    return f"""
+<div class="section-header" id="buoys">
+  <span class="region-flag">📡 NDBC Buoy Data</span>
+  <h2>Offshore Buoy Observations — Nearest Station · Live NDBC Data</h2>
+  <div class="section-line"></div>
+</div>
+<table class="buoy-table">
+  <thead><tr>
+    <th>Location</th><th>Station</th><th>🌊 Wave Ht</th><th>Period</th>
+    <th>Direction</th><th>💨 Wind</th><th>🌡 Water</th><th>Pressure</th>
+    <th>Sea State</th><th>24hr Trend</th><th></th>
+  </tr></thead>
+  <tbody>{rows}</tbody>
+</table>
+<p style="font-size:0.72rem;color:var(--muted);margin-bottom:24px;">
+  Sea state: Calm &lt;2ft · Slight 2–4ft · Moderate 4–8ft · Rough 8–13ft · Very Rough 13ft+ &nbsp;|&nbsp; Trend based on 12-hr buoy comparison &nbsp;|&nbsp; Source: <a href="https://www.ndbc.noaa.gov" target="_blank">NOAA NDBC</a>
+</p>"""
+
+def build_html(city_data, buoy_data, nhc_two, gs_lines):
     today_str = now.strftime("%A, %B %-d")
 
     # Overview boxes
@@ -397,6 +531,9 @@ def build_html(city_data, nhc_two, gs_lines):
         overview_item(icon, label, names, city_data)
         for icon, label, names in OVERVIEW_REGIONS
     )
+
+    # Buoy table
+    buoy_table_html = build_buoy_table(buoy_data)
 
     # City sections
     sections_html = ""
@@ -470,6 +607,7 @@ def build_html(city_data, nhc_two, gs_lines):
     <a href="#midatlantic">Mid-Atlantic</a>
     <a href="#southeast">Southeast</a>
     <a href="#florida">Florida</a>
+    <a href="#buoys">Buoy Data</a>
     <a href="#tropics">Tropics &amp; Offshore</a>
     <a href="#mariner">Mariner Notes</a>
     <a href="https://captaingeorgia.com/weather-analysis-1" target="_blank">Captain Georgia Weather ↗</a>
@@ -501,6 +639,8 @@ def build_html(city_data, nhc_two, gs_lines):
     {overview_html}
   </div>
 </div>
+
+{buoy_table_html}
 
 {sections_html}
 
@@ -586,12 +726,15 @@ def build_html(city_data, nhc_two, gs_lines):
 def main():
     print("Fetching NWS city data via JSON API...", file=sys.stderr)
     city_data = {}
+    buoy_data = {}
     for city in CITIES:
         print(f"  {city['name']} ({city['code']})...", file=sys.stderr)
         d = fetch_nws_api(city["lat"], city["lon"], city["code"])
-        print(f"    Wave height buoy {city['buoy']}...", file=sys.stderr)
-        d["wave_height"] = fetch_wave_height(city["buoy"])
+        print(f"    Buoy {city['buoy']}...", file=sys.stderr)
+        bd = fetch_buoy_full(city["buoy"])
+        d["wave_height"] = bd["wvht"]
         city_data[city["name"]] = d
+        buoy_data[city["name"]] = bd
         time.sleep(0.5)   # polite rate limiting
 
     print("Fetching NHC Tropical Weather Outlook...", file=sys.stderr)
@@ -601,7 +744,7 @@ def main():
     gs_lines = fetch_gulf_stream()
 
     print("Building HTML...", file=sys.stderr)
-    html = build_html(city_data, nhc_two, gs_lines)
+    html = build_html(city_data, buoy_data, nhc_two, gs_lines)
 
     with open("index.html", "w", encoding="utf-8") as f:
         f.write(html)
