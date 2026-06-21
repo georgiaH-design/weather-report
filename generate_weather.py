@@ -333,8 +333,44 @@ footer strong{color:#fff;}
 @media(max-width:600px){.city-grid{grid-template-columns:1fr;}.header-top{flex-direction:column;gap:8px;text-align:center;}}
 """
 
+OVERVIEW_REGIONS = [
+    ("🧭", "Maine / New England",       ["Portland"]),
+    ("🌊", "Massachusetts / Boston",    ["Boston"]),
+    ("🗽", "New York / NJ Coast",       ["New York"]),
+    ("⚓", "Virginia / Hampton Roads",  ["Norfolk"]),
+    ("☀️", "South Carolina",            ["Charleston"]),
+    ("⛈", "Northeast Florida",         ["Jacksonville"]),
+    ("🌴", "South Florida",             ["Fort Lauderdale", "Miami"]),
+]
+
+def overview_item(icon, label, city_names, city_data):
+    lines = []
+    for cn in city_names:
+        d = city_data.get(cn, {})
+        temp = d.get("temp", "N/A")
+        cond = d.get("conditions", "N/A")
+        wind = d.get("wind", "N/A")
+        next_period = d.get("periods", [{}])[0] if d.get("periods") else {}
+        next_name = next_period.get("name", "")
+        next_desc = next_period.get("desc", "")
+        # Trim detailed forecast to ~80 chars for the overview
+        if len(next_desc) > 80:
+            next_desc = next_desc[:77].rsplit(" ", 1)[0] + "…"
+        summary = f"<strong>{cn}:</strong> {temp} · {cond} · Wind {wind}"
+        if next_name and next_desc:
+            summary += f"<br><em>{next_name}:</em> {next_desc}"
+        lines.append(summary)
+    body = "<br><br>".join(lines)
+    return f'<div class="overview-item"><div class="ov-region">{icon} {label}</div><div class="ov-summary">{body}</div></div>'
+
 def build_html(city_data, nhc_two, gs_lines):
     today_str = now.strftime("%A, %B %-d")
+
+    # Overview boxes
+    overview_html = "\n    ".join(
+        overview_item(icon, label, names, city_data)
+        for icon, label, names in OVERVIEW_REGIONS
+    )
 
     # City sections
     sections_html = ""
@@ -433,13 +469,7 @@ def build_html(city_data, nhc_two, gs_lines):
 <div class="overview-card">
   <h2>🗺️ Regional Overview — Next 48 Hours · Generated {today_str} at 03:00 EDT</h2>
   <div class="overview-grid">
-    <div class="overview-item"><div class="ov-region">🧭 Maine / New England</div><div class="ov-summary">Live NWS API data — see Portland forecast below.</div></div>
-    <div class="overview-item"><div class="ov-region">⛈ Massachusetts / Boston</div><div class="ov-summary">Live NWS API data — see Boston forecast below.</div></div>
-    <div class="overview-item"><div class="ov-region">🌊 New York / NJ Coast</div><div class="ov-summary">Live NWS API data — see New York forecast below.</div></div>
-    <div class="overview-item"><div class="ov-region">🌡 Virginia / Hampton Roads</div><div class="ov-summary">Live NWS API data — see Norfolk forecast below.</div></div>
-    <div class="overview-item"><div class="ov-region">☀️ South Carolina</div><div class="ov-summary">Live NWS API data — see Charleston forecast below.</div></div>
-    <div class="overview-item"><div class="ov-region">⛈ Northeast Florida</div><div class="ov-summary">Live NWS API data — see Jacksonville forecast below.</div></div>
-    <div class="overview-item"><div class="ov-region">🌤 South Florida</div><div class="ov-summary">Live NWS API data — see Fort Lauderdale &amp; Miami below.</div></div>
+    {overview_html}
   </div>
 </div>
 
