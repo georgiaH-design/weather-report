@@ -95,7 +95,26 @@ main{max-width:1280px;margin:0 auto;padding:16px 20px 40px;}
 footer{background:var(--navy);color:#93c5fd;text-align:center;padding:20px;font-size:0.8rem;margin-top:32px;}
 footer a{color:#7dd3fc;}
 footer strong{color:#fff;}
-@media(max-width:600px){.city-grid{grid-template-columns:1fr;}.header-top{flex-direction:column;gap:8px;text-align:center;}}
+.buoy-table{width:100%;border-collapse:collapse;background:var(--card);border-radius:10px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,0.07);font-size:0.84rem;margin-bottom:8px;}
+.buoy-table thead tr{background:linear-gradient(90deg,#0a2540,#0c5c7a);}
+.buoy-table th{color:#bae6fd;font-size:0.70rem;text-transform:uppercase;letter-spacing:0.6px;padding:8px 12px;text-align:left;font-weight:700;white-space:nowrap;}
+.buoy-table td{padding:6px 12px;border-bottom:1px solid #f1f5f9;vertical-align:middle;white-space:nowrap;}
+.buoy-table tr:last-child td{border-bottom:none;}
+.buoy-table tr:nth-child(even) td{background:#f8fafc;}
+.buoy-table .grp-row td{background:#0a3d5c;color:#7dd3fc;font-size:0.68rem;font-weight:700;letter-spacing:1px;padding:3px 12px;text-transform:uppercase;}
+.bloc{font-weight:700;color:var(--navy);font-size:0.84rem;}
+.bid{font-size:0.70rem;color:var(--muted);}
+.bwv{font-weight:800;color:#0e7490;font-size:0.92rem;}
+.sea-calm{background:#dcfce7;color:#15803d;}
+.sea-moderate{background:#fef9c3;color:#a16207;}
+.sea-rough{background:#fee2e2;color:#dc2626;}
+.sea-very-rough{background:#7f1d1d;color:#fecaca;}
+.bsea{display:inline-block;padding:2px 8px;border-radius:8px;font-size:0.68rem;font-weight:700;}
+.trend-up{color:#dc2626;font-weight:700;}
+.trend-down{color:#15803d;font-weight:700;}
+.trend-steady{color:#64748b;font-weight:700;}
+.ndbc-lnk{color:var(--teal);text-decoration:none;font-size:0.70rem;font-weight:600;}
+@media(max-width:600px){.city-grid{grid-template-columns:1fr;}.header-top{flex-direction:column;gap:8px;text-align:center;}.buoy-table{font-size:0.72rem;}}
 </style>
 </head>
 <body>
@@ -110,7 +129,7 @@ footer strong{color:#fff;}
     </div>
     <div class="report-meta">
       <strong>East Coast 48-Hour Maritime Weather Report</strong><br>
-      Issued: Sunday, June 21, 2026 · 5:11 PM EDT<br>
+      Issued: Sunday, June 21, 2026 · 5:26 PM EDT<br>
       Source: NOAA / National Weather Service<br>
       Valid through: Tuesday, June 23, 2026
     </div>
@@ -124,6 +143,7 @@ footer strong{color:#fff;}
     <a href="#midatlantic">Mid-Atlantic</a>
     <a href="#southeast">Southeast</a>
     <a href="#florida">Florida</a>
+    <a href="#buoys">Buoy Data</a>
     <a href="#tropics">Tropics &amp; Offshore</a>
     <a href="#mariner">Mariner Notes</a>
     <a href="https://captaingeorgia.com/weather-analysis-1" target="_blank">Captain Georgia Weather ↗</a>
@@ -132,7 +152,7 @@ footer strong{color:#fff;}
   <div class="issue-banner">
     <div class="ib-item">
       <span class="ib-label">📅 Issued</span>
-      <span class="ib-val">Sunday, June 21, 2026 · 5:11 PM EDT</span>
+      <span class="ib-val">Sunday, June 21, 2026 · 5:26 PM EDT</span>
     </div>
     <div class="ib-sep"></div>
     <div class="ib-item">
@@ -152,12 +172,178 @@ footer strong{color:#fff;}
 <div class="overview-card">
   <h2>🗺️ Regional Overview — Next 48 Hours · Generated Sunday, June 21 at 03:00 EDT</h2>
   <div class="overview-grid">
-    <div class="overview-item"><div class="ov-region">🧭 Maine / New England</div><div class="ov-summary"><strong>Portland:</strong> 73°F · Mostly Clear · Wind W 22kt (25mph)<br><em>This Afternoon:</em> A chance of showers and thunderstorms. Partly sunny, with a high near 71.…<br><br><strong>Boston:</strong> 70°F · Light Rain · Wind N/A<br><em>This Afternoon:</em> A slight chance of showers and thunderstorms. Mostly sunny, with a high near…<br><br><strong>Newport:</strong> 73°F · Mostly Clear · Wind SSW 29kt (33mph) G76kt<br><em>This Afternoon:</em> Sunny, with a high near 76. Southwest wind around 13 mph.</div></div>
-    <div class="overview-item"><div class="ov-region">🌊 Mid-Atlantic</div><div class="ov-summary"><strong>New York:</strong> 79°F · Partly Cloudy · Wind S 50kt (58mph)<br><em>This Afternoon:</em> A slight chance of rain showers. Mostly sunny. High near 82, with…<br><br><strong>Chesapeake Bay:</strong> 86°F · Partly Cloudy · Wind NW 36kt (41mph)<br><em>This Afternoon:</em> Mostly sunny, with a high near 88. South wind around 8 mph.<br><br><strong>Norfolk:</strong> 88°F · Mostly Cloudy · Wind E 18kt (21mph)<br><em>This Afternoon:</em> Mostly sunny, with a high near 85. Southeast wind around 9 mph.</div></div>
-    <div class="overview-item"><div class="ov-region">🌴 Southeast / NE Florida</div><div class="ov-summary"><strong>Outer Banks:</strong> 84°F · Clear · Wind SSW 29kt (33mph)<br><em>This Afternoon:</em> Sunny, with a high near 89. South wind around 14 mph, with gusts as high as…<br><br><strong>Charleston:</strong> 84°F · Mostly Cloudy · Wind SSW 29kt (33mph)<br><em>This Afternoon:</em> A slight chance of showers and thunderstorms. Mostly sunny, with a high near…<br><br><strong>Jacksonville:</strong> 77°F · Thunderstorms and Rain and Fog/Mist · Wind W 15kt (17mph)<br><em>This Afternoon:</em> Showers and thunderstorms likely. Mostly cloudy. High near 90, with…</div></div>
-    <div class="overview-item"><div class="ov-region">🌴 South Florida / Keys</div><div class="ov-summary"><strong>Fort Lauderdale:</strong> 93°F · Smoke · Wind SE 36kt (41mph)<br><em>This Afternoon:</em> A chance of showers and thunderstorms. Mostly sunny, with a high near 92.…<br><br><strong>Miami:</strong> 90°F · Mostly Clear · Wind SSE 32kt (37mph)<br><em>This Afternoon:</em> A chance of showers and thunderstorms. Sunny, with a high near 90. Heat…<br><br><strong>Key West:</strong> 90°F · Clear · Wind SE 22kt (25mph)<br><em>This Afternoon:</em> Sunny, with a high near 91. North wind around 0 mph.</div></div>
+    <div class="overview-item"><div class="ov-region">🧭 Maine / New England</div><div class="ov-summary"><strong>Portland:</strong> 72°F · Partly Cloudy · Wind W 25kt (29mph)<br><em>This Afternoon:</em> A chance of showers and thunderstorms. Partly sunny, with a high near 71.…<br><br><strong>Boston:</strong> 70°F · Light Rain · Wind NNE 40kt (46mph)<br><em>This Afternoon:</em> A slight chance of showers and thunderstorms. Mostly sunny, with a high near…<br><br><strong>Newport:</strong> 74°F · Clear · Wind SSW 29kt (33mph) G69kt<br><em>This Afternoon:</em> Sunny, with a high near 76. Southwest wind around 13 mph.</div></div>
+    <div class="overview-item"><div class="ov-region">🌊 Mid-Atlantic</div><div class="ov-summary"><strong>New York:</strong> 77°F · Clear · Wind N/A<br><em>This Afternoon:</em> A slight chance of rain showers. Mostly sunny. High near 82, with…<br><br><strong>Chesapeake Bay:</strong> 86°F · Partly Cloudy · Wind N 29kt (33mph)<br><em>This Afternoon:</em> Mostly sunny, with a high near 88. South wind around 8 mph.<br><br><strong>Norfolk:</strong> 88°F · Mostly Cloudy · Wind E 22kt (25mph)<br><em>This Afternoon:</em> Mostly sunny, with a high near 85. Southeast wind around 9 mph.</div></div>
+    <div class="overview-item"><div class="ov-region">🌴 Southeast / NE Florida</div><div class="ov-summary"><strong>Outer Banks:</strong> 84°F · Clear · Wind SSW 22kt (25mph)<br><em>This Afternoon:</em> Sunny, with a high near 89. South wind around 14 mph, with gusts as high as…<br><br><strong>Charleston:</strong> 84°F · Partly Cloudy · Wind N/A<br><em>This Afternoon:</em> A slight chance of showers and thunderstorms. Mostly sunny, with a high near…<br><br><strong>Jacksonville:</strong> 77°F · N/A · Wind W 15kt (17mph)<br><em>This Afternoon:</em> Showers and thunderstorms likely. Mostly cloudy. High near 90, with…</div></div>
+    <div class="overview-item"><div class="ov-region">🌴 South Florida / Keys</div><div class="ov-summary"><strong>Fort Lauderdale:</strong> 91°F · Smoke · Wind ESE 36kt (41mph)<br><em>This Afternoon:</em> A chance of showers and thunderstorms. Mostly sunny, with a high near 92.…<br><br><strong>Miami:</strong> 90°F · Mostly Clear · Wind SSE 36kt (41mph) G54kt<br><em>This Afternoon:</em> A chance of showers and thunderstorms. Mostly sunny, with a high near 90.…<br><br><strong>Key West:</strong> 90°F · Clear · Wind SSE 18kt (21mph)<br><em>This Afternoon:</em> Sunny, with a high near 91. North wind around 0 mph.</div></div>
   </div>
 </div>
+
+
+<div class="section-header" id="buoys">
+  <span class="region-flag">📡 NDBC Buoy Data</span>
+  <h2>Offshore Buoy Observations — Nearest Station · Live NDBC Data</h2>
+  <div class="section-line"></div>
+</div>
+<table class="buoy-table">
+  <thead><tr>
+    <th>Location</th><th>Station</th><th>🌊 Wave Ht</th><th>Period</th>
+    <th>Direction</th><th>💨 Wind</th><th>🌡 Water</th><th>Pressure</th>
+    <th>Sea State</th><th>24hr Trend</th><th></th>
+  </tr></thead>
+  <tbody><tr class="grp-row"><td colspan="10">🧭 Northeast</td></tr>
+<tr>
+  <td><div class="bloc">Portland</div></td>
+  <td><div class="bid">44007</div></td>
+  <td class="bwv">N/A</td>
+  <td>N/A</td>
+  <td>N/A</td>
+  <td>SW 4kt G4kt</td>
+  <td>56°F</td>
+  <td>1009 mb</td>
+  <td><span class="bsea sea-calm">N/A</span></td>
+  <td><span class="trend-steady">→ Steady</span></td>
+  <td><a class="ndbc-lnk" href="https://www.ndbc.noaa.gov/station_page.php?station=44007" target="_blank">↗</a></td>
+</tr><tr>
+  <td><div class="bloc">Boston</div></td>
+  <td><div class="bid">44013</div></td>
+  <td class="bwv">N/A</td>
+  <td>N/A</td>
+  <td>N/A</td>
+  <td>NNW 16kt G21kt</td>
+  <td>60°F</td>
+  <td>1011 mb</td>
+  <td><span class="bsea sea-calm">N/A</span></td>
+  <td><span class="trend-steady">→ Steady</span></td>
+  <td><a class="ndbc-lnk" href="https://www.ndbc.noaa.gov/station_page.php?station=44013" target="_blank">↗</a></td>
+</tr><tr>
+  <td><div class="bloc">Newport</div></td>
+  <td><div class="bid">44017</div></td>
+  <td class="bwv">N/A</td>
+  <td>N/A</td>
+  <td>N/A</td>
+  <td>N/A</td>
+  <td>N/A</td>
+  <td>N/A</td>
+  <td><span class="bsea sea-calm">N/A</span></td>
+  <td><span class="trend-steady">→ Steady</span></td>
+  <td><a class="ndbc-lnk" href="https://www.ndbc.noaa.gov/station_page.php?station=44017" target="_blank">↗</a></td>
+</tr><tr class="grp-row"><td colspan="10">🌊 Mid-Atlantic</td></tr>
+<tr>
+  <td><div class="bloc">New York</div></td>
+  <td><div class="bid">44025</div></td>
+  <td class="bwv">N/A</td>
+  <td>N/A</td>
+  <td>N/A</td>
+  <td>SSW 12kt G14kt</td>
+  <td>69°F</td>
+  <td>1012 mb</td>
+  <td><span class="bsea sea-calm">N/A</span></td>
+  <td><span class="trend-steady">→ Steady</span></td>
+  <td><a class="ndbc-lnk" href="https://www.ndbc.noaa.gov/station_page.php?station=44025" target="_blank">↗</a></td>
+</tr><tr>
+  <td><div class="bloc">Chesapeake Bay</div></td>
+  <td><div class="bid">CHLV2</div></td>
+  <td class="bwv">N/A</td>
+  <td>N/A</td>
+  <td>N/A</td>
+  <td>N/A</td>
+  <td>N/A</td>
+  <td>N/A</td>
+  <td><span class="bsea sea-calm">N/A</span></td>
+  <td><span class="trend-steady">→ Steady</span></td>
+  <td><a class="ndbc-lnk" href="https://www.ndbc.noaa.gov/station_page.php?station=CHLV2" target="_blank">↗</a></td>
+</tr><tr>
+  <td><div class="bloc">Norfolk</div></td>
+  <td><div class="bid">44014</div></td>
+  <td class="bwv">N/A</td>
+  <td>N/A</td>
+  <td>N/A</td>
+  <td>N/A</td>
+  <td>73°F</td>
+  <td>N/A</td>
+  <td><span class="bsea sea-calm">N/A</span></td>
+  <td><span class="trend-steady">→ Steady</span></td>
+  <td><a class="ndbc-lnk" href="https://www.ndbc.noaa.gov/station_page.php?station=44014" target="_blank">↗</a></td>
+</tr><tr class="grp-row"><td colspan="10">🌴 Southeast</td></tr>
+<tr>
+  <td><div class="bloc">Outer Banks</div></td>
+  <td><div class="bid">41025</div></td>
+  <td class="bwv">N/A</td>
+  <td>N/A</td>
+  <td>N/A</td>
+  <td>SW 10kt G12kt</td>
+  <td>80°F</td>
+  <td>1014 mb</td>
+  <td><span class="bsea sea-calm">N/A</span></td>
+  <td><span class="trend-steady">→ Steady</span></td>
+  <td><a class="ndbc-lnk" href="https://www.ndbc.noaa.gov/station_page.php?station=41025" target="_blank">↗</a></td>
+</tr><tr>
+  <td><div class="bloc">Charleston</div></td>
+  <td><div class="bid">41004</div></td>
+  <td class="bwv">N/A</td>
+  <td>N/A</td>
+  <td>N/A</td>
+  <td>S 10kt G12kt</td>
+  <td>82°F</td>
+  <td>1015 mb</td>
+  <td><span class="bsea sea-calm">N/A</span></td>
+  <td><span class="trend-steady">→ Steady</span></td>
+  <td><a class="ndbc-lnk" href="https://www.ndbc.noaa.gov/station_page.php?station=41004" target="_blank">↗</a></td>
+</tr><tr>
+  <td><div class="bloc">Jacksonville</div></td>
+  <td><div class="bid">41008</div></td>
+  <td class="bwv">N/A</td>
+  <td>N/A</td>
+  <td>N/A</td>
+  <td>S 10kt G12kt</td>
+  <td>N/A</td>
+  <td>1015 mb</td>
+  <td><span class="bsea sea-calm">N/A</span></td>
+  <td><span class="trend-steady">→ Steady</span></td>
+  <td><a class="ndbc-lnk" href="https://www.ndbc.noaa.gov/station_page.php?station=41008" target="_blank">↗</a></td>
+</tr><tr class="grp-row"><td colspan="10">🌴 Florida</td></tr>
+<tr>
+  <td><div class="bloc">Fort Lauderdale</div></td>
+  <td><div class="bid">FWYF1</div></td>
+  <td class="bwv">N/A</td>
+  <td>N/A</td>
+  <td>N/A</td>
+  <td>N/A</td>
+  <td>N/A</td>
+  <td>N/A</td>
+  <td><span class="bsea sea-calm">N/A</span></td>
+  <td><span class="trend-steady">→ Steady</span></td>
+  <td><a class="ndbc-lnk" href="https://www.ndbc.noaa.gov/station_page.php?station=FWYF1" target="_blank">↗</a></td>
+</tr><tr>
+  <td><div class="bloc">Miami</div></td>
+  <td><div class="bid">FWYF1</div></td>
+  <td class="bwv">N/A</td>
+  <td>N/A</td>
+  <td>N/A</td>
+  <td>N/A</td>
+  <td>N/A</td>
+  <td>N/A</td>
+  <td><span class="bsea sea-calm">N/A</span></td>
+  <td><span class="trend-steady">→ Steady</span></td>
+  <td><a class="ndbc-lnk" href="https://www.ndbc.noaa.gov/station_page.php?station=FWYF1" target="_blank">↗</a></td>
+</tr><tr>
+  <td><div class="bloc">Key West</div></td>
+  <td><div class="bid">SMKF1</div></td>
+  <td class="bwv">N/A</td>
+  <td>N/A</td>
+  <td>N/A</td>
+  <td>SSE 4kt G6kt</td>
+  <td>N/A</td>
+  <td>1016 mb</td>
+  <td><span class="bsea sea-calm">N/A</span></td>
+  <td><span class="trend-steady">→ Steady</span></td>
+  <td><a class="ndbc-lnk" href="https://www.ndbc.noaa.gov/station_page.php?station=SMKF1" target="_blank">↗</a></td>
+</tr></tbody>
+</table>
+<p style="font-size:0.72rem;color:var(--muted);margin-bottom:24px;">
+  Sea state: Calm &lt;2ft · Slight 2–4ft · Moderate 4–8ft · Rough 8–13ft · Very Rough 13ft+ &nbsp;|&nbsp; Trend based on 12-hr buoy comparison &nbsp;|&nbsp; Source: <a href="https://www.ndbc.noaa.gov" target="_blank">NOAA NDBC</a>
+</p>
 
 
 <div class="section-header" id="northeast">
@@ -173,17 +359,17 @@ footer strong{color:#fff;}
         <div class="city-state">MAINE · KPWM · 43.6°N</div>
       </div>
       <div class="current-temp">
-        <div class="temp-val">73°F</div>
+        <div class="temp-val">72°F</div>
         <div class="temp-label">Current</div>
       </div>
     </div>
     <div class="current-row">
-      <div class="curr-item">🌤 Mostly Clear</div>
-      <div class="curr-item">💧 Humidity: <span>69%</span></div>
-      <div class="curr-item">💨 Wind: <span>W 22kt (25mph)</span></div>
+      <div class="curr-item">🌤 Partly Cloudy</div>
+      <div class="curr-item">💧 Humidity: <span>73%</span></div>
+      <div class="curr-item">💨 Wind: <span>W 25kt (29mph)</span></div>
       <div class="curr-item">👁 Vis: <span>10.0 mi</span></div>
-      <div class="curr-item">🌊 Waves: <span>2.0 ft (0.6 m)</span></div>
-      <span class="heat">&nbsp;HI 74°F&nbsp;</span>
+      <div class="curr-item">🌊 Waves: <span>N/A</span></div>
+      <span class="heat">&nbsp;HI 72°F&nbsp;</span>
     </div>
     <div class="forecast-list">
       <h4>48-Hour Forecast (NWS GYX)</h4>
@@ -238,8 +424,8 @@ footer strong{color:#fff;}
     <div class="current-row">
       <div class="curr-item">🌤 Light Rain</div>
       <div class="curr-item">💧 Humidity: <span>73%</span></div>
-      <div class="curr-item">💨 Wind: <span>N/A</span></div>
-      <div class="curr-item">👁 Vis: <span>7.0 mi</span></div>
+      <div class="curr-item">💨 Wind: <span>NNE 40kt (46mph)</span></div>
+      <div class="curr-item">👁 Vis: <span>9.0 mi</span></div>
       <div class="curr-item">🌊 Waves: <span>N/A</span></div>
       
     </div>
@@ -289,17 +475,17 @@ footer strong{color:#fff;}
         <div class="city-state">RHODE ISLAND · KUUU · 41.5°N</div>
       </div>
       <div class="current-temp">
-        <div class="temp-val">73°F</div>
+        <div class="temp-val">74°F</div>
         <div class="temp-label">Current</div>
       </div>
     </div>
     <div class="current-row">
-      <div class="curr-item">🌤 Mostly Clear</div>
-      <div class="curr-item">💧 Humidity: <span>51%</span></div>
-      <div class="curr-item">💨 Wind: <span>SSW 29kt (33mph) G76kt</span></div>
+      <div class="curr-item">🌤 Clear</div>
+      <div class="curr-item">💧 Humidity: <span>50%</span></div>
+      <div class="curr-item">💨 Wind: <span>SSW 29kt (33mph) G69kt</span></div>
       <div class="curr-item">👁 Vis: <span>10.0 mi</span></div>
       <div class="curr-item">🌊 Waves: <span>N/A</span></div>
-      <span class="heat">&nbsp;HI 72°F&nbsp;</span>
+      <span class="heat">&nbsp;HI 73°F&nbsp;</span>
     </div>
     <div class="forecast-list">
       <h4>48-Hour Forecast (NWS BOX)</h4>
@@ -354,17 +540,17 @@ footer strong{color:#fff;}
         <div class="city-state">NEW YORK · KJFK · 40.6°N</div>
       </div>
       <div class="current-temp">
-        <div class="temp-val">79°F</div>
+        <div class="temp-val">77°F</div>
         <div class="temp-label">Current</div>
       </div>
     </div>
     <div class="current-row">
-      <div class="curr-item">🌤 Partly Cloudy</div>
-      <div class="curr-item">💧 Humidity: <span>48%</span></div>
-      <div class="curr-item">💨 Wind: <span>S 50kt (58mph)</span></div>
+      <div class="curr-item">🌤 Clear</div>
+      <div class="curr-item">💧 Humidity: <span>50%</span></div>
+      <div class="curr-item">💨 Wind: <span>N/A</span></div>
       <div class="curr-item">👁 Vis: <span>10.0 mi</span></div>
       <div class="curr-item">🌊 Waves: <span>N/A</span></div>
-      <span class="heat">&nbsp;HI 79°F&nbsp;</span>
+      <span class="heat">&nbsp;HI 77°F&nbsp;</span>
     </div>
     <div class="forecast-list">
       <h4>48-Hour Forecast (NWS OKX)</h4>
@@ -418,8 +604,8 @@ footer strong{color:#fff;}
     </div>
     <div class="current-row">
       <div class="curr-item">🌤 Partly Cloudy</div>
-      <div class="curr-item">💧 Humidity: <span>33%</span></div>
-      <div class="curr-item">💨 Wind: <span>NW 36kt (41mph)</span></div>
+      <div class="curr-item">💧 Humidity: <span>32%</span></div>
+      <div class="curr-item">💨 Wind: <span>N 29kt (33mph)</span></div>
       <div class="curr-item">👁 Vis: <span>10.0 mi</span></div>
       <div class="curr-item">🌊 Waves: <span>N/A</span></div>
       <span class="heat">&nbsp;HI 84°F&nbsp;</span>
@@ -476,10 +662,10 @@ footer strong{color:#fff;}
     </div>
     <div class="current-row">
       <div class="curr-item">🌤 Mostly Cloudy</div>
-      <div class="curr-item">💧 Humidity: <span>43%</span></div>
-      <div class="curr-item">💨 Wind: <span>E 18kt (21mph)</span></div>
+      <div class="curr-item">💧 Humidity: <span>40%</span></div>
+      <div class="curr-item">💨 Wind: <span>E 22kt (25mph)</span></div>
       <div class="curr-item">👁 Vis: <span>10.0 mi</span></div>
-      <div class="curr-item">🌊 Waves: <span>2.3 ft (0.7 m)</span></div>
+      <div class="curr-item">🌊 Waves: <span>N/A</span></div>
       <span class="heat">&nbsp;HI 88°F&nbsp;</span>
     </div>
     <div class="forecast-list">
@@ -541,11 +727,11 @@ footer strong{color:#fff;}
     </div>
     <div class="current-row">
       <div class="curr-item">🌤 Clear</div>
-      <div class="curr-item">💧 Humidity: <span>52%</span></div>
-      <div class="curr-item">💨 Wind: <span>SSW 29kt (33mph)</span></div>
+      <div class="curr-item">💧 Humidity: <span>55%</span></div>
+      <div class="curr-item">💨 Wind: <span>SSW 22kt (25mph)</span></div>
       <div class="curr-item">👁 Vis: <span>10.0 mi</span></div>
-      <div class="curr-item">🌊 Waves: <span>1.6 ft (0.5 m)</span></div>
-      <span class="heat">&nbsp;HI 86°F&nbsp;</span>
+      <div class="curr-item">🌊 Waves: <span>N/A</span></div>
+      <span class="heat">&nbsp;HI 87°F&nbsp;</span>
     </div>
     <div class="forecast-list">
       <h4>48-Hour Forecast (NWS MHX)</h4>
@@ -598,11 +784,11 @@ footer strong{color:#fff;}
       </div>
     </div>
     <div class="current-row">
-      <div class="curr-item">🌤 Mostly Cloudy</div>
+      <div class="curr-item">🌤 Partly Cloudy</div>
       <div class="curr-item">💧 Humidity: <span>74%</span></div>
-      <div class="curr-item">💨 Wind: <span>SSW 29kt (33mph)</span></div>
+      <div class="curr-item">💨 Wind: <span>N/A</span></div>
       <div class="curr-item">👁 Vis: <span>10.0 mi</span></div>
-      <div class="curr-item">🌊 Waves: <span>1.6 ft (0.5 m)</span></div>
+      <div class="curr-item">🌊 Waves: <span>N/A</span></div>
       <span class="heat">&nbsp;HI 92°F&nbsp;</span>
     </div>
     <div class="forecast-list">
@@ -656,7 +842,7 @@ footer strong{color:#fff;}
       </div>
     </div>
     <div class="current-row">
-      <div class="curr-item">🌤 Thunderstorms and Rain and Fog/Mist</div>
+      <div class="curr-item">🌤 N/A</div>
       <div class="curr-item">💧 Humidity: <span>89%</span></div>
       <div class="curr-item">💨 Wind: <span>W 15kt (17mph)</span></div>
       <div class="curr-item">👁 Vis: <span>6.0 mi</span></div>
@@ -716,17 +902,17 @@ footer strong{color:#fff;}
         <div class="city-state">FLORIDA · KFXE · 26.1°N · Home Port</div>
       </div>
       <div class="current-temp">
-        <div class="temp-val">93°F</div>
+        <div class="temp-val">91°F</div>
         <div class="temp-label">Current</div>
       </div>
     </div>
     <div class="current-row">
       <div class="curr-item">🌤 Smoke</div>
-      <div class="curr-item">💧 Humidity: <span>56%</span></div>
-      <div class="curr-item">💨 Wind: <span>SE 36kt (41mph)</span></div>
+      <div class="curr-item">💧 Humidity: <span>59%</span></div>
+      <div class="curr-item">💨 Wind: <span>ESE 36kt (41mph)</span></div>
       <div class="curr-item">👁 Vis: <span>10.0 mi</span></div>
       <div class="curr-item">🌊 Waves: <span>N/A</span></div>
-      <span class="heat">&nbsp;HI 105°F&nbsp;</span>
+      <span class="heat">&nbsp;HI 103°F&nbsp;</span>
     </div>
     <div class="forecast-list">
       <h4>48-Hour Forecast (NWS MFL)</h4>
@@ -780,11 +966,11 @@ footer strong{color:#fff;}
     </div>
     <div class="current-row">
       <div class="curr-item">🌤 Mostly Clear</div>
-      <div class="curr-item">💧 Humidity: <span>52%</span></div>
-      <div class="curr-item">💨 Wind: <span>SSE 32kt (37mph)</span></div>
+      <div class="curr-item">💧 Humidity: <span>56%</span></div>
+      <div class="curr-item">💨 Wind: <span>SSE 36kt (41mph) G54kt</span></div>
       <div class="curr-item">👁 Vis: <span>10.0 mi</span></div>
       <div class="curr-item">🌊 Waves: <span>N/A</span></div>
-      <span class="heat">&nbsp;HI 95°F&nbsp;</span>
+      <span class="heat">&nbsp;HI 96°F&nbsp;</span>
     </div>
     <div class="forecast-list">
       <h4>48-Hour Forecast (NWS MFL)</h4>
@@ -792,7 +978,7 @@ footer strong{color:#fff;}
       <div class="period">
         <div class="period-name">This Afternoon</div>
         <div class="period-temp temp-hi">90°F</div>
-        <div class="period-desc">A chance of showers and thunderstorms. Sunny, with a high near 90. Heat index values as high as 100. South wind around 9 mph. Chance of precipitation is 30%. New rainfall amounts less than a tenth of </div>
+        <div class="period-desc">A chance of showers and thunderstorms. Mostly sunny, with a high near 90. Heat index values as high as 100. South wind around 9 mph. Chance of precipitation is 30%. New rainfall amounts less than a te</div>
       </div>
       <div class="period">
         <div class="period-name">Tonight</div>
@@ -839,7 +1025,7 @@ footer strong{color:#fff;}
     <div class="current-row">
       <div class="curr-item">🌤 Clear</div>
       <div class="curr-item">💧 Humidity: <span>67%</span></div>
-      <div class="curr-item">💨 Wind: <span>SE 22kt (25mph)</span></div>
+      <div class="curr-item">💨 Wind: <span>SSE 18kt (21mph)</span></div>
       <div class="curr-item">👁 Vis: <span>10.0 mi</span></div>
       <div class="curr-item">🌊 Waves: <span>N/A</span></div>
       <span class="heat">&nbsp;HI 103°F&nbsp;</span>
@@ -896,7 +1082,7 @@ footer strong{color:#fff;}
   <div class="status-card all-clear">
     <div class="status-title">🌀 Atlantic Tropics Status</div>
     <div class="status-value">SEE NHC BELOW</div>
-    <div class="status-sub">NHC Tropical Weather Outlook — current as of Sunday, June 21, 2026 · 5:11 PM EDT</div>
+    <div class="status-sub">NHC Tropical Weather Outlook — current as of Sunday, June 21, 2026 · 5:26 PM EDT</div>
   </div>
   <div class="status-card info">
     <div class="status-title">🌊 Gulf Stream</div>
