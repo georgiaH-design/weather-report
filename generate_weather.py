@@ -161,6 +161,11 @@ header{background:linear-gradient(135deg,var(--navy) 0%,var(--blue) 100%);color:
 .brand-sub{font-size:0.8rem;color:#93c5fd;letter-spacing:1px;text-transform:uppercase;}
 .report-meta{text-align:right;font-size:0.82rem;color:#93c5fd;}
 .report-meta strong{color:#fff;font-size:0.9rem;}
+.issue-banner{background:#0a3d5c;color:#fff;text-align:center;padding:12px 20px;display:flex;justify-content:center;align-items:center;gap:40px;flex-wrap:wrap;border-bottom:3px solid var(--gold);}
+.ib-item{display:flex;flex-direction:column;align-items:center;gap:2px;}
+.ib-label{font-size:0.68rem;text-transform:uppercase;letter-spacing:1.2px;color:#7dd3fc;font-weight:700;}
+.ib-val{font-size:1.1rem;font-weight:800;color:#fff;letter-spacing:0.3px;}
+.ib-sep{width:1px;height:40px;background:rgba(255,255,255,0.2);}
 .header-title{padding:16px 32px 20px;text-align:center;}
 .header-title h1{font-size:1.8rem;font-weight:700;margin-bottom:4px;}
 .header-title p{color:#93c5fd;font-size:0.92rem;}
@@ -315,6 +320,22 @@ def build_html(city_data, nhc_two, gs_lines):
     <a href="https://captaingeorgia.com/weather-analysis-1" target="_blank">Captain Georgia Weather ↗</a>
     <a href="https://captaingeorgia.com/nws-marine-forecast" target="_blank">NWS Marine Forecast ↗</a>
   </nav>
+  <div class="issue-banner">
+    <div class="ib-item">
+      <span class="ib-label">📅 Issued</span>
+      <span class="ib-val">{ISSUE_TIME}</span>
+    </div>
+    <div class="ib-sep"></div>
+    <div class="ib-item">
+      <span class="ib-label">⏱ Valid Through</span>
+      <span class="ib-val">{VALID_THRU}</span>
+    </div>
+    <div class="ib-sep"></div>
+    <div class="ib-item">
+      <span class="ib-label">📡 Data Source</span>
+      <span class="ib-val">NOAA / NWS / NHC — Live</span>
+    </div>
+  </div>
 </header>
 
 <main>
