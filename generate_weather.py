@@ -73,13 +73,37 @@ def m_to_mi(m):
         return None
     return round(float(m) / 1609.34, 1)
 
+# ── NDBC wave height fetcher ─────────────────────────────────────────────────
+
+def fetch_wave_height(buoy_id):
+    """Fetch significant wave height from NDBC buoy realtime data."""
+    url = f"https://www.ndbc.noaa.gov/data/realtime2/{buoy_id}.txt"
+    text = fetch_text(url)
+    if not text:
+        return "N/A"
+    lines = [l for l in text.strip().split('\n') if not l.startswith('#')]
+    if not lines:
+        return "N/A"
+    parts = lines[0].split()
+    if len(parts) < 9:
+        return "N/A"
+    wvht = parts[8]  # WVHT column = significant wave height in meters
+    if wvht == 'MM':
+        return "N/A"
+    try:
+        wvht_m = float(wvht)
+        wvht_ft = round(wvht_m * 3.28084, 1)
+        return f"{wvht_ft} ft ({wvht_m:.1f} m)"
+    except Exception:
+        return "N/A"
+
 # ── NWS API data fetcher ──────────────────────────────────────────────────────
 
 def fetch_nws_api(lat, lon, station_code):
     """Fetch current observations + 48-hr forecast via NWS JSON API."""
     data = {
         "temp": "N/A", "conditions": "N/A", "humidity": "N/A",
-        "wind": "N/A", "visibility": "N/A", "heat_index": "", "periods": []
+        "wind": "N/A", "visibility": "N/A", "heat_index": "", "wave_height": "N/A", "periods": []
     }
 
     # ── Current observations ──────────────────────────────────────────────────
@@ -171,21 +195,25 @@ def fetch_gulf_stream():
 # ── City definitions ──────────────────────────────────────────────────────────
 
 CITIES = [
-    {"name": "Portland",        "state": "MAINE",          "code": "KPWM", "lat": "43.6591", "lon": "-70.2568", "site": "GYX", "lat_d": "43.6°N"},
-    {"name": "Boston",          "state": "MASSACHUSETTS",  "code": "KBOS", "lat": "42.3601", "lon": "-71.0589", "site": "BOX", "lat_d": "42.4°N"},
-    {"name": "New York",        "state": "NEW YORK",       "code": "KJFK", "lat": "40.6413", "lon": "-73.7781", "site": "OKX", "lat_d": "40.6°N"},
-    {"name": "Norfolk",         "state": "VIRGINIA",       "code": "KORF", "lat": "36.9076", "lon": "-76.0179", "site": "AKQ", "lat_d": "36.9°N"},
-    {"name": "Charleston",      "state": "SOUTH CAROLINA", "code": "KCHS", "lat": "32.8986", "lon": "-80.0407", "site": "CHS", "lat_d": "32.9°N"},
-    {"name": "Jacksonville",    "state": "FLORIDA",        "code": "KNIP", "lat": "30.3322", "lon": "-81.6557", "site": "JAX", "lat_d": "30.2°N"},
-    {"name": "Fort Lauderdale", "state": "FLORIDA",        "code": "KFXE", "lat": "26.1224", "lon": "-80.1373", "site": "MFL", "lat_d": "26.1°N"},
-    {"name": "Miami",           "state": "FLORIDA",        "code": "KMIA", "lat": "25.7617", "lon": "-80.1918", "site": "MFL", "lat_d": "25.8°N"},
+    {"name": "Portland",        "state": "MAINE",          "code": "KPWM", "lat": "43.6591", "lon": "-70.2568", "site": "GYX", "lat_d": "43.6°N", "buoy": "44007"},
+    {"name": "Boston",          "state": "MASSACHUSETTS",  "code": "KBOS", "lat": "42.3601", "lon": "-71.0589", "site": "BOX", "lat_d": "42.4°N", "buoy": "44013"},
+    {"name": "Newport",         "state": "RHODE ISLAND",   "code": "KUUU", "lat": "41.5321", "lon": "-71.2815", "site": "BOX", "lat_d": "41.5°N", "buoy": "44017"},
+    {"name": "New York",        "state": "NEW YORK",       "code": "KJFK", "lat": "40.6413", "lon": "-73.7781", "site": "OKX", "lat_d": "40.6°N", "buoy": "44025"},
+    {"name": "Chesapeake Bay",  "state": "MARYLAND",       "code": "KNHK", "lat": "38.2840", "lon": "-76.4110", "site": "LWX", "lat_d": "38.3°N", "buoy": "CHLV2"},
+    {"name": "Norfolk",         "state": "VIRGINIA",       "code": "KORF", "lat": "36.9076", "lon": "-76.0179", "site": "AKQ", "lat_d": "36.9°N", "buoy": "44014"},
+    {"name": "Outer Banks",     "state": "NORTH CAROLINA", "code": "KHSE", "lat": "35.2330", "lon": "-75.6177", "site": "MHX", "lat_d": "35.2°N", "buoy": "41025"},
+    {"name": "Charleston",      "state": "SOUTH CAROLINA", "code": "KCHS", "lat": "32.8986", "lon": "-80.0407", "site": "CHS", "lat_d": "32.9°N", "buoy": "41004"},
+    {"name": "Jacksonville",    "state": "FLORIDA",        "code": "KNIP", "lat": "30.3322", "lon": "-81.6557", "site": "JAX", "lat_d": "30.2°N", "buoy": "41008"},
+    {"name": "Fort Lauderdale", "state": "FLORIDA",        "code": "KFXE", "lat": "26.1224", "lon": "-80.1373", "site": "MFL", "lat_d": "26.1°N", "buoy": "FWYF1"},
+    {"name": "Miami",           "state": "FLORIDA",        "code": "KMIA", "lat": "25.7617", "lon": "-80.1918", "site": "MFL", "lat_d": "25.8°N", "buoy": "FWYF1"},
+    {"name": "Key West",        "state": "FLORIDA",        "code": "KEYW", "lat": "24.5561", "lon": "-81.7595", "site": "KEY", "lat_d": "24.6°N", "buoy": "SMKF1"},
 ]
 
 REGIONS = [
-    ("northeast",   "🧭 Northeast",   "Maine · Massachusetts",                        ["Portland", "Boston"]),
-    ("midatlantic", "🌊 Mid-Atlantic", "New York · Virginia",                          ["New York", "Norfolk"]),
-    ("southeast",   "🌴 Southeast",   "South Carolina",                               ["Charleston"]),
-    ("florida",     "🌴 Florida",     "Jacksonville · Fort Lauderdale · Miami",        ["Jacksonville", "Fort Lauderdale", "Miami"]),
+    ("northeast",   "🧭 Northeast",   "Maine · Rhode Island · Massachusetts",                    ["Portland", "Boston", "Newport"]),
+    ("midatlantic", "🌊 Mid-Atlantic", "New York · Chesapeake Bay · Virginia",                   ["New York", "Chesapeake Bay", "Norfolk"]),
+    ("southeast",   "🌴 Southeast",   "North Carolina · South Carolina · NE Florida",            ["Outer Banks", "Charleston", "Jacksonville"]),
+    ("florida",     "🌴 Florida",     "Fort Lauderdale · Miami · Key West",                      ["Fort Lauderdale", "Miami", "Key West"]),
 ]
 
 # ── HTML builder ──────────────────────────────────────────────────────────────
@@ -230,6 +258,7 @@ def city_card_html(city, data):
       <div class="curr-item">💧 Humidity: <span>{data['humidity']}</span></div>
       <div class="curr-item">💨 Wind: <span>{data['wind']}</span></div>
       <div class="curr-item">👁 Vis: <span>{data['visibility']}</span></div>
+      <div class="curr-item">🌊 Waves: <span>{data['wave_height']}</span></div>
       {hi_badge}
     </div>
     <div class="forecast-list">
@@ -334,13 +363,10 @@ footer strong{color:#fff;}
 """
 
 OVERVIEW_REGIONS = [
-    ("🧭", "Maine / New England",       ["Portland"]),
-    ("🌊", "Massachusetts / Boston",    ["Boston"]),
-    ("🗽", "New York / NJ Coast",       ["New York"]),
-    ("⚓", "Virginia / Hampton Roads",  ["Norfolk"]),
-    ("☀️", "South Carolina",            ["Charleston"]),
-    ("⛈", "Northeast Florida",         ["Jacksonville"]),
-    ("🌴", "South Florida",             ["Fort Lauderdale", "Miami"]),
+    ("🧭", "Maine / New England",        ["Portland", "Boston", "Newport"]),
+    ("🌊", "Mid-Atlantic",               ["New York", "Chesapeake Bay", "Norfolk"]),
+    ("🌴", "Southeast / NE Florida",     ["Outer Banks", "Charleston", "Jacksonville"]),
+    ("🌴", "South Florida / Keys",       ["Fort Lauderdale", "Miami", "Key West"]),
 ]
 
 def overview_item(icon, label, city_names, city_data):
@@ -380,7 +406,7 @@ def build_html(city_data, nhc_two, gs_lines):
             city = next(c for c in CITIES if c["name"] == cn)
             d = city_data.get(cn, {
                 "temp": "N/A", "conditions": "N/A", "humidity": "N/A",
-                "wind": "N/A", "visibility": "N/A", "heat_index": "", "periods": []
+                "wind": "N/A", "visibility": "N/A", "heat_index": "", "wave_height": "N/A", "periods": []
             })
             cards += city_card_html(city, d)
         sections_html += f"""
@@ -562,7 +588,10 @@ def main():
     city_data = {}
     for city in CITIES:
         print(f"  {city['name']} ({city['code']})...", file=sys.stderr)
-        city_data[city["name"]] = fetch_nws_api(city["lat"], city["lon"], city["code"])
+        d = fetch_nws_api(city["lat"], city["lon"], city["code"])
+        print(f"    Wave height buoy {city['buoy']}...", file=sys.stderr)
+        d["wave_height"] = fetch_wave_height(city["buoy"])
+        city_data[city["name"]] = d
         time.sleep(0.5)   # polite rate limiting
 
     print("Fetching NHC Tropical Weather Outlook...", file=sys.stderr)
