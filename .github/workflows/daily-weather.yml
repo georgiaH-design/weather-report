@@ -31,4 +31,22 @@ jobs:
           git config user.email "actions@github.com"
           git add index.html
           git diff --staged --quiet || git commit -m "Daily weather report — $(date -u '+%Y-%m-%d %H:%M UTC')"
+          git pull --rebase origin main
           git push
+
+      - name: Post to Facebook Page
+        run: |
+          DATE=$(date -u '+%B %-d, %Y')
+          MESSAGE="🌊 48-Hour East Coast Maritime Weather Forecast — ${DATE}
+
+Your daily briefing covering offshore conditions, wind & sea state, Gulf Stream position, and tropical activity from Maine to Miami.
+
+📡 Live NOAA/NWS/NHC data — updated every morning at 0300.
+
+🔗 Full report: https://georgiah-design.github.io/weather-report/
+
+#MaritimeWeather #EastCoast #CaptainGeorgia #Offshore #Sailing #Boating"
+
+          curl -s -X POST "https://graph.facebook.com/v20.0/${{ secrets.FB_PAGE_ID }}/feed" \
+            -d "message=${MESSAGE}" \
+            -d "access_token=${{ secrets.FB_PAGE_ACCESS_TOKEN }}"
