@@ -16,6 +16,11 @@ header{background:linear-gradient(135deg,var(--navy) 0%,var(--blue) 100%);color:
 .brand-sub{font-size:0.8rem;color:#93c5fd;letter-spacing:1px;text-transform:uppercase;}
 .report-meta{text-align:right;font-size:0.82rem;color:#93c5fd;}
 .report-meta strong{color:#fff;font-size:0.9rem;}
+.issue-banner{background:#0a3d5c;color:#fff;text-align:center;padding:12px 20px;display:flex;justify-content:center;align-items:center;gap:40px;flex-wrap:wrap;border-bottom:3px solid var(--gold);}
+.ib-item{display:flex;flex-direction:column;align-items:center;gap:2px;}
+.ib-label{font-size:0.68rem;text-transform:uppercase;letter-spacing:1.2px;color:#7dd3fc;font-weight:700;}
+.ib-val{font-size:1.1rem;font-weight:800;color:#fff;letter-spacing:0.3px;}
+.ib-sep{width:1px;height:40px;background:rgba(255,255,255,0.2);}
 .header-title{padding:16px 32px 20px;text-align:center;}
 .header-title h1{font-size:1.8rem;font-weight:700;margin-bottom:4px;}
 .header-title p{color:#93c5fd;font-size:0.92rem;}
@@ -56,8 +61,6 @@ main{max-width:1280px;margin:0 auto;padding:16px 20px 40px;}
 .temp-hi{color:#dc2626;font-weight:700;}
 .temp-lo{color:#2563eb;font-weight:700;}
 .period-desc{color:var(--text);}
-.precip{background:#dbeafe;color:#1e40af;font-size:0.72rem;font-weight:700;padding:1px 6px;border-radius:10px;}
-.precip-high{background:#fee2e2;color:#dc2626;}
 .card-footer{display:flex;justify-content:space-between;align-items:center;padding:8px 14px;background:#f8fafc;border-top:1px solid var(--border);font-size:0.75rem;color:var(--muted);}
 .card-footer a{color:var(--teal);font-weight:600;text-decoration:none;}
 .mariner-box{background:linear-gradient(135deg,var(--navy) 0%,#1a3a5c 100%);color:#fff;border-radius:12px;padding:24px 28px;margin-top:28px;}
@@ -76,17 +79,9 @@ main{max-width:1280px;margin:0 auto;padding:16px 20px 40px;}
 .status-card.info .status-title{color:var(--teal);}
 .status-value{font-size:1.35rem;font-weight:700;color:var(--text);line-height:1.2;margin-bottom:4px;}
 .status-sub{font-size:0.79rem;color:var(--muted);line-height:1.5;}
-.offshore-table{width:100%;border-collapse:collapse;font-size:0.82rem;background:var(--card);border-radius:10px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,0.07);margin-bottom:20px;}
-.offshore-table th{background:var(--navy);color:#fff;padding:10px 12px;text-align:left;font-size:0.76rem;text-transform:uppercase;letter-spacing:0.4px;}
-.offshore-table td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:top;line-height:1.45;}
-.offshore-table tr:last-child td{border-bottom:none;}
-.offshore-table tr:nth-child(even) td{background:#f8fafc;}
-.zone-name{font-weight:700;color:var(--navy);}
-.zone-sub{font-size:0.74rem;color:var(--muted);}
-.sea-state{display:inline-block;padding:2px 8px;border-radius:12px;font-size:0.77rem;font-weight:700;}
-.sea-calm{background:#dcfce7;color:#15803d;}
-.sea-moderate{background:#fef9c3;color:#a16207;}
-.sea-rough{background:#fee2e2;color:#dc2626;}
+.nhc-block{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:20px 24px;margin-bottom:20px;box-shadow:0 1px 4px rgba(0,0,0,0.07);}
+.nhc-block h2{font-size:1.1rem;color:var(--navy);margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid var(--teal);}
+.nhc-text{font-size:0.87rem;font-family:monospace;white-space:pre-wrap;color:var(--text);line-height:1.7;max-height:400px;overflow-y:auto;}
 .gulf-stream-box{background:linear-gradient(135deg,#0a1f3a 0%,#0c6682 100%);color:#fff;border-radius:10px;padding:18px 22px;margin-bottom:20px;display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:start;}
 .gs-icon{font-size:2.4rem;}
 .gs-title{font-size:0.77rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#7dd3fc;margin-bottom:6px;}
@@ -112,7 +107,7 @@ footer strong{color:#fff;}
     </div>
     <div class="report-meta">
       <strong>East Coast 48-Hour Maritime Weather Report</strong><br>
-      Issued: Sunday, June 21, 2026 · 2:09 PM EDT<br>
+      Issued: Sunday, June 21, 2026 · 4:50 PM EDT<br>
       Source: NOAA / National Weather Service<br>
       Valid through: Tuesday, June 23, 2026
     </div>
@@ -131,6 +126,22 @@ footer strong{color:#fff;}
     <a href="https://captaingeorgia.com/weather-analysis-1" target="_blank">Captain Georgia Weather ↗</a>
     <a href="https://captaingeorgia.com/nws-marine-forecast" target="_blank">NWS Marine Forecast ↗</a>
   </nav>
+  <div class="issue-banner">
+    <div class="ib-item">
+      <span class="ib-label">📅 Issued</span>
+      <span class="ib-val">Sunday, June 21, 2026 · 4:50 PM EDT</span>
+    </div>
+    <div class="ib-sep"></div>
+    <div class="ib-item">
+      <span class="ib-label">⏱ Valid Through</span>
+      <span class="ib-val">Tuesday, June 23, 2026</span>
+    </div>
+    <div class="ib-sep"></div>
+    <div class="ib-item">
+      <span class="ib-label">📡 Data Source</span>
+      <span class="ib-val">NOAA / NWS / NHC — Live</span>
+    </div>
+  </div>
 </header>
 
 <main>
@@ -138,13 +149,13 @@ footer strong{color:#fff;}
 <div class="overview-card">
   <h2>🗺️ Regional Overview — Next 48 Hours · Generated Sunday, June 21 at 03:00 EDT</h2>
   <div class="overview-grid">
-    <div class="overview-item"><div class="ov-region">🧭 Maine / New England</div><div class="ov-summary">Live NWS data — see Portland forecast below.</div></div>
-    <div class="overview-item"><div class="ov-region">⛈ Massachusetts / Boston</div><div class="ov-summary">Live NWS data — see Boston forecast below.</div></div>
-    <div class="overview-item"><div class="ov-region">🌊 New York / NJ Coast</div><div class="ov-summary">Live NWS data — see New York forecast below.</div></div>
-    <div class="overview-item"><div class="ov-region">🌡 Virginia / Hampton Roads</div><div class="ov-summary">Live NWS data — see Norfolk forecast below.</div></div>
-    <div class="overview-item"><div class="ov-region">☀️ South Carolina</div><div class="ov-summary">Live NWS data — see Charleston forecast below.</div></div>
-    <div class="overview-item"><div class="ov-region">⛈ Northeast Florida</div><div class="ov-summary">Live NWS data — see Jacksonville forecast below.</div></div>
-    <div class="overview-item"><div class="ov-region">🌤 South Florida</div><div class="ov-summary">Live NWS data — see Fort Lauderdale &amp; Miami below.</div></div>
+    <div class="overview-item"><div class="ov-region">🧭 Maine / New England</div><div class="ov-summary">Live NWS API data — see Portland forecast below.</div></div>
+    <div class="overview-item"><div class="ov-region">⛈ Massachusetts / Boston</div><div class="ov-summary">Live NWS API data — see Boston forecast below.</div></div>
+    <div class="overview-item"><div class="ov-region">🌊 New York / NJ Coast</div><div class="ov-summary">Live NWS API data — see New York forecast below.</div></div>
+    <div class="overview-item"><div class="ov-region">🌡 Virginia / Hampton Roads</div><div class="ov-summary">Live NWS API data — see Norfolk forecast below.</div></div>
+    <div class="overview-item"><div class="ov-region">☀️ South Carolina</div><div class="ov-summary">Live NWS API data — see Charleston forecast below.</div></div>
+    <div class="overview-item"><div class="ov-region">⛈ Northeast Florida</div><div class="ov-summary">Live NWS API data — see Jacksonville forecast below.</div></div>
+    <div class="overview-item"><div class="ov-region">🌤 South Florida</div><div class="ov-summary">Live NWS API data — see Fort Lauderdale &amp; Miami below.</div></div>
   </div>
 </div>
 
@@ -162,38 +173,49 @@ footer strong{color:#fff;}
         <div class="city-state">MAINE · KPWM · 43.6°N</div>
       </div>
       <div class="current-temp">
-        <div class="temp-val">68°F</div>
+        <div class="temp-val">72°F</div>
         <div class="temp-label">Current</div>
       </div>
     </div>
     <div class="current-row">
-      <div class="curr-item">💧 Humidity: <span>N/A</span></div>
-      <div class="curr-item">💨 Wind: <span>N/A</span></div>
-      <div class="curr-item">👁 Vis: <span>N/A</span></div>
-      
+      <div class="curr-item">🌤 Partly Cloudy</div>
+      <div class="curr-item">💧 Humidity: <span>73%</span></div>
+      <div class="curr-item">💨 Wind: <span>S 14kt (17mph)</span></div>
+      <div class="curr-item">👁 Vis: <span>10.0 mi</span></div>
+      <span class="heat">&nbsp;HI 72°F&nbsp;</span>
     </div>
     <div class="forecast-list">
       <h4>48-Hour Forecast (NWS GYX)</h4>
       
       <div class="period">
-        <div class="period-name">Current conditions at</div>
-        <div class="period-temp temp-lo">68°F</div>
-        <div class="period-desc"></div>
+        <div class="period-name">This Afternoon</div>
+        <div class="period-temp temp-hi">71°F</div>
+        <div class="period-desc">A chance of showers and thunderstorms. Partly sunny, with a high near 71. West wind around 5 mph. Chance of precipitation is 40%. New rainfall amounts less than a tenth of an inch possible.</div>
       </div>
       <div class="period">
-        <div class="period-name">Lat:&nbsp;</div>
-        <div class="period-temp temp-lo">59°F</div>
-        <div class="period-desc"></div>
+        <div class="period-name">Tonight</div>
+        <div class="period-temp temp-hi">56°F</div>
+        <div class="period-desc">A chance of showers and thunderstorms before 8pm, then patchy fog. Partly cloudy, with a low around 56. Northwest wind 0 to 5 mph. Chance of precipitation is 30%. New rainfall amounts less than a tent</div>
       </div>
       <div class="period">
-        <div class="period-name">Lon:&nbsp;</div>
-        <div class="period-temp temp-lo"></div>
-        <div class="period-desc"></div>
+        <div class="period-name">Monday</div>
+        <div class="period-temp temp-hi">68°F</div>
+        <div class="period-desc">A slight chance of rain showers between 3pm and 4pm, then rain likely. Partly sunny, with a high near 68. Southeast wind 0 to 10 mph. Chance of precipitation is 60%. New rainfall amounts less than a t</div>
       </div>
       <div class="period">
-        <div class="period-name">Elev:&nbsp;</div>
-        <div class="period-temp temp-lo"></div>
-        <div class="period-desc"></div>
+        <div class="period-name">Monday Night</div>
+        <div class="period-temp temp-hi">56°F</div>
+        <div class="period-desc">Rain before 4am, then rain and patchy fog. Cloudy, with a low around 56. Southeast wind 5 to 10 mph. Chance of precipitation is 100%.</div>
+      </div>
+      <div class="period">
+        <div class="period-name">Tuesday</div>
+        <div class="period-temp temp-hi">71°F</div>
+        <div class="period-desc">Rain and patchy fog before 8am, then rain showers and patchy fog. Mostly cloudy, with a high near 71. Southwest wind 5 to 10 mph. Chance of precipitation is 80%.</div>
+      </div>
+      <div class="period">
+        <div class="period-name">Tuesday Night</div>
+        <div class="period-temp temp-hi">58°F</div>
+        <div class="period-desc">A slight chance of rain showers before 8pm, then patchy fog. Partly cloudy, with a low around 58.</div>
       </div>
     </div>
     <div class="card-footer">
@@ -208,43 +230,49 @@ footer strong{color:#fff;}
         <div class="city-state">MASSACHUSETTS · KBOS · 42.4°N</div>
       </div>
       <div class="current-temp">
-        <div class="temp-val">79°F</div>
+        <div class="temp-val">73°F</div>
         <div class="temp-label">Current</div>
       </div>
     </div>
     <div class="current-row">
-      <div class="curr-item">💧 Humidity: <span>N/A</span></div>
+      <div class="curr-item">🌤 Light Rain</div>
+      <div class="curr-item">💧 Humidity: <span>57%</span></div>
       <div class="curr-item">💨 Wind: <span>N/A</span></div>
-      <div class="curr-item">👁 Vis: <span>N/A</span></div>
-      
+      <div class="curr-item">👁 Vis: <span>7.0 mi</span></div>
+      <span class="heat">&nbsp;HI 73°F&nbsp;</span>
     </div>
     <div class="forecast-list">
       <h4>48-Hour Forecast (NWS BOX)</h4>
       
       <div class="period">
-        <div class="period-name">Current conditions at</div>
-        <div class="period-temp temp-lo">79°F</div>
-        <div class="period-desc"></div>
+        <div class="period-name">This Afternoon</div>
+        <div class="period-temp temp-hi">81°F</div>
+        <div class="period-desc">A slight chance of showers and thunderstorms. Mostly sunny, with a high near 81. Northwest wind around 8 mph. Chance of precipitation is 20%.</div>
       </div>
       <div class="period">
-        <div class="period-name">Lat:&nbsp;</div>
-        <div class="period-temp temp-lo">51°F</div>
-        <div class="period-desc"></div>
+        <div class="period-name">Tonight</div>
+        <div class="period-temp temp-hi">62°F</div>
+        <div class="period-desc">A slight chance of showers and thunderstorms before 7pm. Partly cloudy, with a low around 62. West wind 2 to 6 mph. Chance of precipitation is 20%.</div>
       </div>
       <div class="period">
-        <div class="period-name">Lon:&nbsp;</div>
-        <div class="period-temp temp-lo">79°F</div>
-        <div class="period-desc"></div>
+        <div class="period-name">Monday</div>
+        <div class="period-temp temp-hi">78°F</div>
+        <div class="period-desc">A chance of rain showers between 2pm and 4pm, then showers and thunderstorms likely. Mostly cloudy, with a high near 78. Southeast wind 1 to 7 mph. Chance of precipitation is 60%. New rainfall amounts</div>
       </div>
       <div class="period">
-        <div class="period-name">Elev:&nbsp;</div>
-        <div class="period-temp temp-lo"></div>
-        <div class="period-desc"></div>
+        <div class="period-name">Monday Night</div>
+        <div class="period-temp temp-hi">63°F</div>
+        <div class="period-desc">Showers and thunderstorms. Cloudy, with a low around 63. South wind around 8 mph. Chance of precipitation is 80%. New rainfall amounts between a quarter and half of an inch possible.</div>
       </div>
       <div class="period">
-        <div class="period-name">Heat Index</div>
-        <div class="period-temp temp-lo"></div>
-        <div class="period-desc"></div>
+        <div class="period-name">Tuesday</div>
+        <div class="period-temp temp-hi">78°F</div>
+        <div class="period-desc">Showers and thunderstorms. Mostly cloudy, with a high near 78. West wind around 8 mph. Chance of precipitation is 80%.</div>
+      </div>
+      <div class="period">
+        <div class="period-name">Tuesday Night</div>
+        <div class="period-temp temp-hi">63°F</div>
+        <div class="period-desc">A chance of rain showers before 8pm. Mostly clear, with a low around 63. Northwest wind around 5 mph. Chance of precipitation is 30%.</div>
       </div>
     </div>
     <div class="card-footer">
@@ -271,38 +299,44 @@ footer strong{color:#fff;}
       </div>
     </div>
     <div class="current-row">
-      <div class="curr-item">💧 Humidity: <span>N/A</span></div>
-      <div class="curr-item">💨 Wind: <span>N/A</span></div>
-      <div class="curr-item">👁 Vis: <span>N/A</span></div>
-      
+      <div class="curr-item">🌤 Partly Cloudy</div>
+      <div class="curr-item">💧 Humidity: <span>45%</span></div>
+      <div class="curr-item">💨 Wind: <span>S 47kt (54mph)</span></div>
+      <div class="curr-item">👁 Vis: <span>10.0 mi</span></div>
+      <span class="heat">&nbsp;HI 78°F&nbsp;</span>
     </div>
     <div class="forecast-list">
       <h4>48-Hour Forecast (NWS OKX)</h4>
       
       <div class="period">
-        <div class="period-name">Current conditions at</div>
-        <div class="period-temp temp-lo">79°F</div>
-        <div class="period-desc"></div>
+        <div class="period-name">This Afternoon</div>
+        <div class="period-temp temp-hi">82°F</div>
+        <div class="period-desc">A slight chance of rain showers. Mostly sunny. High near 82, with temperatures falling to around 79 in the afternoon. Southwest wind around 12 mph. Chance of precipitation is 20%.</div>
       </div>
       <div class="period">
-        <div class="period-name">Lat:&nbsp;</div>
-        <div class="period-temp temp-lo">51°F</div>
-        <div class="period-desc"></div>
+        <div class="period-name">Tonight</div>
+        <div class="period-temp temp-hi">65°F</div>
+        <div class="period-desc">Partly cloudy. Low around 65, with temperatures rising to around 67 overnight. South wind 0 to 10 mph.</div>
       </div>
       <div class="period">
-        <div class="period-name">Lon:&nbsp;</div>
-        <div class="period-temp temp-lo">79°F</div>
-        <div class="period-desc"></div>
+        <div class="period-name">Monday</div>
+        <div class="period-temp temp-hi">76°F</div>
+        <div class="period-desc">A chance of rain showers between 8am and 2pm, then showers and thunderstorms likely. Mostly cloudy. High near 76, with temperatures falling to around 72 in the afternoon. Southeast wind 3 to 18 mph, w</div>
       </div>
       <div class="period">
-        <div class="period-name">Elev:&nbsp;</div>
-        <div class="period-temp temp-lo"></div>
-        <div class="period-desc"></div>
+        <div class="period-name">Monday Night</div>
+        <div class="period-temp temp-hi">66°F</div>
+        <div class="period-desc">Showers and thunderstorms. Cloudy. Low around 66, with temperatures rising to around 68 overnight. South wind 10 to 18 mph, with gusts as high as 32 mph. Chance of precipitation is 100%. New rainfall </div>
       </div>
       <div class="period">
-        <div class="period-name">Heat Index</div>
-        <div class="period-temp temp-lo"></div>
-        <div class="period-desc"></div>
+        <div class="period-name">Tuesday</div>
+        <div class="period-temp temp-hi">81°F</div>
+        <div class="period-desc">Rain showers likely. Mostly cloudy, with a high near 81. Northwest wind around 12 mph. Chance of precipitation is 70%. New rainfall amounts between a quarter and half of an inch possible.</div>
+      </div>
+      <div class="period">
+        <div class="period-name">Tuesday Night</div>
+        <div class="period-temp temp-hi">64°F</div>
+        <div class="period-desc">A slight chance of rain showers before 8pm. Partly cloudy, with a low around 64. New rainfall amounts less than a tenth of an inch possible.</div>
       </div>
     </div>
     <div class="card-footer">
@@ -322,38 +356,44 @@ footer strong{color:#fff;}
       </div>
     </div>
     <div class="current-row">
-      <div class="curr-item">💧 Humidity: <span>N/A</span></div>
-      <div class="curr-item">💨 Wind: <span>N/A</span></div>
-      <div class="curr-item">👁 Vis: <span>N/A</span></div>
-      
+      <div class="curr-item">🌤 Mostly Cloudy</div>
+      <div class="curr-item">💧 Humidity: <span>40%</span></div>
+      <div class="curr-item">💨 Wind: <span>N 0kt (0mph)</span></div>
+      <div class="curr-item">👁 Vis: <span>10.0 mi</span></div>
+      <span class="heat">&nbsp;HI 88°F&nbsp;</span>
     </div>
     <div class="forecast-list">
       <h4>48-Hour Forecast (NWS AKQ)</h4>
       
       <div class="period">
-        <div class="period-name">Current conditions at</div>
-        <div class="period-temp temp-lo">88°F</div>
-        <div class="period-desc"></div>
+        <div class="period-name">This Afternoon</div>
+        <div class="period-temp temp-hi">85°F</div>
+        <div class="period-desc">Mostly sunny, with a high near 85. Southeast wind around 9 mph.</div>
       </div>
       <div class="period">
-        <div class="period-name">Lat:&nbsp;</div>
-        <div class="period-temp temp-lo">59°F</div>
-        <div class="period-desc"></div>
+        <div class="period-name">Tonight</div>
+        <div class="period-temp temp-hi">74°F</div>
+        <div class="period-desc">Partly cloudy, with a low around 74. South wind around 9 mph.</div>
       </div>
       <div class="period">
-        <div class="period-name">Lon:&nbsp;</div>
-        <div class="period-temp temp-lo">87°F</div>
-        <div class="period-desc"></div>
+        <div class="period-name">Monday</div>
+        <div class="period-temp temp-hi">91°F</div>
+        <div class="period-desc">Mostly sunny, with a high near 91. South wind 9 to 18 mph, with gusts as high as 28 mph.</div>
       </div>
       <div class="period">
-        <div class="period-name">Elev:&nbsp;</div>
-        <div class="period-temp temp-lo"></div>
-        <div class="period-desc"></div>
+        <div class="period-name">Monday Night</div>
+        <div class="period-temp temp-hi">75°F</div>
+        <div class="period-desc">A chance of showers and thunderstorms between 9pm and 10pm, then a chance of showers and thunderstorms between 10pm and 1am, then a chance of showers and thunderstorms between 1am and 3am. Partly clou</div>
       </div>
       <div class="period">
-        <div class="period-name">Heat Index</div>
-        <div class="period-temp temp-lo"></div>
-        <div class="period-desc"></div>
+        <div class="period-name">Tuesday</div>
+        <div class="period-temp temp-hi">84°F</div>
+        <div class="period-desc">A slight chance of rain showers between 8am and 2pm, then showers and thunderstorms likely. Partly sunny, with a high near 84. Northwest wind around 10 mph. Chance of precipitation is 60%. New rainfal</div>
+      </div>
+      <div class="period">
+        <div class="period-name">Tuesday Night</div>
+        <div class="period-temp temp-hi">72°F</div>
+        <div class="period-desc">Showers and thunderstorms likely before 8pm, then a slight chance of showers and thunderstorms between 8pm and 2am. Partly cloudy, with a low around 72. Chance of precipitation is 60%. New rainfall am</div>
       </div>
     </div>
     <div class="card-footer">
@@ -375,43 +415,49 @@ footer strong{color:#fff;}
         <div class="city-state">SOUTH CAROLINA · KCHS · 32.9°N</div>
       </div>
       <div class="current-temp">
-        <div class="temp-val">90°F</div>
+        <div class="temp-val">82°F</div>
         <div class="temp-label">Current</div>
       </div>
     </div>
     <div class="current-row">
-      <div class="curr-item">💧 Humidity: <span>N/A</span></div>
-      <div class="curr-item">💨 Wind: <span>N/A</span></div>
-      <div class="curr-item">👁 Vis: <span>N/A</span></div>
-      
+      <div class="curr-item">🌤 Mostly Cloudy</div>
+      <div class="curr-item">💧 Humidity: <span>79%</span></div>
+      <div class="curr-item">💨 Wind: <span>S 32kt (37mph)</span></div>
+      <div class="curr-item">👁 Vis: <span>10.0 mi</span></div>
+      <span class="heat">&nbsp;HI 89°F&nbsp;</span>
     </div>
     <div class="forecast-list">
       <h4>48-Hour Forecast (NWS CHS)</h4>
       
       <div class="period">
-        <div class="period-name">Current conditions at</div>
-        <div class="period-temp temp-lo">90°F</div>
-        <div class="period-desc"></div>
+        <div class="period-name">This Afternoon</div>
+        <div class="period-temp temp-hi">91°F</div>
+        <div class="period-desc">A slight chance of showers and thunderstorms. Mostly sunny, with a high near 91. South wind around 10 mph. Chance of precipitation is 20%.</div>
       </div>
       <div class="period">
-        <div class="period-name">Lat:&nbsp;</div>
-        <div class="period-temp temp-lo">68°F</div>
-        <div class="period-desc"></div>
+        <div class="period-name">Tonight</div>
+        <div class="period-temp temp-hi">73°F</div>
+        <div class="period-desc">A chance of showers and thunderstorms before 8pm. Partly cloudy, with a low around 73. Southwest wind 5 to 10 mph. Chance of precipitation is 30%. New rainfall amounts less than a tenth of an inch pos</div>
       </div>
       <div class="period">
-        <div class="period-name">Lon:&nbsp;</div>
-        <div class="period-temp temp-lo">94°F</div>
-        <div class="period-desc"></div>
+        <div class="period-name">Monday</div>
+        <div class="period-temp temp-hi">94°F</div>
+        <div class="period-desc">A slight chance of showers and thunderstorms after 2pm. Mostly sunny, with a high near 94. Heat index values as high as 102. Southwest wind 6 to 14 mph. Chance of precipitation is 20%. New rainfall am</div>
       </div>
       <div class="period">
-        <div class="period-name">Elev:&nbsp;</div>
-        <div class="period-temp temp-lo"></div>
-        <div class="period-desc"></div>
+        <div class="period-name">Monday Night</div>
+        <div class="period-temp temp-hi">77°F</div>
+        <div class="period-desc">Mostly clear, with a low around 77. Southwest wind 9 to 14 mph.</div>
       </div>
       <div class="period">
-        <div class="period-name">Heat Index</div>
-        <div class="period-temp temp-lo"></div>
-        <div class="period-desc"></div>
+        <div class="period-name">Tuesday</div>
+        <div class="period-temp temp-hi">95°F</div>
+        <div class="period-desc">A chance of showers and thunderstorms after 2pm. Mostly sunny, with a high near 95. West wind 10 to 14 mph, with gusts as high as 22 mph. Chance of precipitation is 40%. New rainfall amounts less than</div>
+      </div>
+      <div class="period">
+        <div class="period-name">Tuesday Night</div>
+        <div class="period-temp temp-hi">74°F</div>
+        <div class="period-desc">A chance of showers and thunderstorms before 11pm, then a chance of showers and thunderstorms between 11pm and 2am. Partly cloudy, with a low around 74. Chance of precipitation is 40%. New rainfall am</div>
       </div>
     </div>
     <div class="card-footer">
@@ -433,43 +479,49 @@ footer strong{color:#fff;}
         <div class="city-state">FLORIDA · KNIP · 30.2°N</div>
       </div>
       <div class="current-temp">
-        <div class="temp-val">90°F</div>
+        <div class="temp-val">78°F</div>
         <div class="temp-label">Current</div>
       </div>
     </div>
     <div class="current-row">
-      <div class="curr-item">💧 Humidity: <span>N/A</span></div>
+      <div class="curr-item">🌤 Thunderstorms and Rain</div>
+      <div class="curr-item">💧 Humidity: <span>87%</span></div>
       <div class="curr-item">💨 Wind: <span>N/A</span></div>
-      <div class="curr-item">👁 Vis: <span>N/A</span></div>
-      
+      <div class="curr-item">👁 Vis: <span>7.0 mi</span></div>
+      <span class="heat">&nbsp;HI 80°F&nbsp;</span>
     </div>
     <div class="forecast-list">
       <h4>48-Hour Forecast (NWS JAX)</h4>
       
       <div class="period">
-        <div class="period-name">Current conditions at</div>
-        <div class="period-temp temp-lo">90°F</div>
-        <div class="period-desc"></div>
+        <div class="period-name">This Afternoon</div>
+        <div class="period-temp temp-hi">90°F</div>
+        <div class="period-desc">Showers and thunderstorms likely. Mostly cloudy. High near 90, with temperatures falling to around 86 in the afternoon. Southwest wind around 8 mph. Chance of precipitation is 60%. New rainfall amount</div>
       </div>
       <div class="period">
-        <div class="period-name">Lat:&nbsp;</div>
-        <div class="period-temp temp-lo">72°F</div>
-        <div class="period-desc"></div>
+        <div class="period-name">Tonight</div>
+        <div class="period-temp temp-hi">76°F</div>
+        <div class="period-desc">A chance of showers and thunderstorms before 8pm, then a chance of showers and thunderstorms between 8pm and 9pm, then a slight chance of showers and thunderstorms between 9pm and 10pm. Partly cloudy.</div>
       </div>
       <div class="period">
-        <div class="period-name">Lon:&nbsp;</div>
-        <div class="period-temp temp-lo">98°F</div>
-        <div class="period-desc"></div>
+        <div class="period-name">Monday</div>
+        <div class="period-temp temp-hi">93°F</div>
+        <div class="period-desc">A chance of showers and thunderstorms after 1pm. Mostly sunny. High near 93, with temperatures falling to around 91 in the afternoon. Heat index values as high as 102. West wind 5 to 10 mph, with gust</div>
       </div>
       <div class="period">
-        <div class="period-name">Elev:&nbsp;</div>
-        <div class="period-temp temp-lo"></div>
-        <div class="period-desc"></div>
+        <div class="period-name">Monday Night</div>
+        <div class="period-temp temp-hi">77°F</div>
+        <div class="period-desc">A chance of showers and thunderstorms before 10pm. Partly cloudy. Low around 77, with temperatures rising to around 78 overnight. Southwest wind 7 to 10 mph. Chance of precipitation is 30%.</div>
       </div>
       <div class="period">
-        <div class="period-name">Heat Index</div>
-        <div class="period-temp temp-lo"></div>
-        <div class="period-desc"></div>
+        <div class="period-name">Tuesday</div>
+        <div class="period-temp temp-hi">96°F</div>
+        <div class="period-desc">A slight chance of showers and thunderstorms after 2pm. Mostly sunny. High near 96, with temperatures falling to around 94 in the afternoon. West wind 8 to 12 mph, with gusts as high as 16 mph. Chance</div>
+      </div>
+      <div class="period">
+        <div class="period-name">Tuesday Night</div>
+        <div class="period-temp temp-hi">77°F</div>
+        <div class="period-desc">A slight chance of showers and thunderstorms before 2am. Partly cloudy, with a low around 77. Chance of precipitation is 20%.</div>
       </div>
     </div>
     <div class="card-footer">
@@ -484,43 +536,49 @@ footer strong{color:#fff;}
         <div class="city-state">FLORIDA · KFXE · 26.1°N · Home Port</div>
       </div>
       <div class="current-temp">
-        <div class="temp-val">92°F</div>
+        <div class="temp-val">93°F</div>
         <div class="temp-label">Current</div>
       </div>
     </div>
     <div class="current-row">
-      <div class="curr-item">💧 Humidity: <span>N/A</span></div>
-      <div class="curr-item">💨 Wind: <span>N/A</span></div>
-      <div class="curr-item">👁 Vis: <span>N/A</span></div>
-      
+      <div class="curr-item">🌤 Smoke</div>
+      <div class="curr-item">💧 Humidity: <span>53%</span></div>
+      <div class="curr-item">💨 Wind: <span>ESE 36kt (41mph)</span></div>
+      <div class="curr-item">👁 Vis: <span>10.0 mi</span></div>
+      <span class="heat">&nbsp;HI 103°F&nbsp;</span>
     </div>
     <div class="forecast-list">
       <h4>48-Hour Forecast (NWS MFL)</h4>
       
       <div class="period">
-        <div class="period-name">Current conditions at</div>
-        <div class="period-temp temp-lo">92°F</div>
-        <div class="period-desc"></div>
+        <div class="period-name">This Afternoon</div>
+        <div class="period-temp temp-hi">92°F</div>
+        <div class="period-desc">A chance of showers and thunderstorms. Sunny, with a high near 92. Heat index values as high as 103. Southeast wind around 8 mph. Chance of precipitation is 50%. New rainfall amounts between a tenth a</div>
       </div>
       <div class="period">
-        <div class="period-name">Lat:&nbsp;</div>
-        <div class="period-temp temp-lo">76°F</div>
-        <div class="period-desc"></div>
+        <div class="period-name">Tonight</div>
+        <div class="period-temp temp-hi">79°F</div>
+        <div class="period-desc">Showers and thunderstorms likely before 9pm. Partly cloudy, with a low around 79. Heat index values as high as 100. West wind 1 to 7 mph. Chance of precipitation is 60%. New rainfall amounts between a</div>
       </div>
       <div class="period">
-        <div class="period-name">Lon:&nbsp;</div>
-        <div class="period-temp temp-lo">105°F</div>
-        <div class="period-desc"></div>
+        <div class="period-name">Monday</div>
+        <div class="period-temp temp-hi">92°F</div>
+        <div class="period-desc">A slight chance of showers and thunderstorms after 3pm. Sunny, with a high near 92. Heat index values as high as 105. Southeast wind 2 to 9 mph. Chance of precipitation is 20%.</div>
       </div>
       <div class="period">
-        <div class="period-name">Elev:&nbsp;</div>
-        <div class="period-temp temp-lo"></div>
-        <div class="period-desc"></div>
+        <div class="period-name">Monday Night</div>
+        <div class="period-temp temp-hi">80°F</div>
+        <div class="period-desc">A slight chance of showers and thunderstorms before 7pm. Mostly cloudy, with a low around 80. Heat index values as high as 100. Southeast wind 2 to 7 mph. Chance of precipitation is 20%.</div>
       </div>
       <div class="period">
-        <div class="period-name">Heat Index</div>
-        <div class="period-temp temp-lo"></div>
-        <div class="period-desc"></div>
+        <div class="period-name">Tuesday</div>
+        <div class="period-temp temp-hi">92°F</div>
+        <div class="period-desc">A chance of showers and thunderstorms after 8am. Mostly sunny, with a high near 92. South wind 2 to 9 mph. Chance of precipitation is 30%.</div>
+      </div>
+      <div class="period">
+        <div class="period-name">Tuesday Night</div>
+        <div class="period-temp temp-hi">79°F</div>
+        <div class="period-desc">A chance of showers and thunderstorms before 8pm. Mostly cloudy, with a low around 79. Southeast wind 2 to 7 mph. Chance of precipitation is 30%.</div>
       </div>
     </div>
     <div class="card-footer">
@@ -535,43 +593,49 @@ footer strong{color:#fff;}
         <div class="city-state">FLORIDA · KMIA · 25.8°N</div>
       </div>
       <div class="current-temp">
-        <div class="temp-val">93°F</div>
+        <div class="temp-val">91°F</div>
         <div class="temp-label">Current</div>
       </div>
     </div>
     <div class="current-row">
-      <div class="curr-item">💧 Humidity: <span>N/A</span></div>
+      <div class="curr-item">🌤 Mostly Clear</div>
+      <div class="curr-item">💧 Humidity: <span>53%</span></div>
       <div class="curr-item">💨 Wind: <span>N/A</span></div>
-      <div class="curr-item">👁 Vis: <span>N/A</span></div>
-      
+      <div class="curr-item">👁 Vis: <span>10.0 mi</span></div>
+      <span class="heat">&nbsp;HI 99°F&nbsp;</span>
     </div>
     <div class="forecast-list">
       <h4>48-Hour Forecast (NWS MFL)</h4>
       
       <div class="period">
-        <div class="period-name">Current conditions at</div>
-        <div class="period-temp temp-lo">93°F</div>
-        <div class="period-desc"></div>
+        <div class="period-name">This Afternoon</div>
+        <div class="period-temp temp-hi">90°F</div>
+        <div class="period-desc">A chance of showers and thunderstorms. Sunny, with a high near 90. Heat index values as high as 100. South wind around 9 mph. Chance of precipitation is 30%. New rainfall amounts less than a tenth of </div>
       </div>
       <div class="period">
-        <div class="period-name">Lat:&nbsp;</div>
-        <div class="period-temp temp-lo">76°F</div>
-        <div class="period-desc"></div>
+        <div class="period-name">Tonight</div>
+        <div class="period-temp temp-hi">82°F</div>
+        <div class="period-desc">A chance of showers and thunderstorms before 8pm. Partly cloudy, with a low around 82. Southeast wind 3 to 8 mph. Chance of precipitation is 50%. New rainfall amounts less than a tenth of an inch poss</div>
       </div>
       <div class="period">
-        <div class="period-name">Lon:&nbsp;</div>
-        <div class="period-temp temp-lo">106°F</div>
-        <div class="period-desc"></div>
+        <div class="period-name">Monday</div>
+        <div class="period-temp temp-hi">89°F</div>
+        <div class="period-desc">Mostly sunny, with a high near 89. Heat index values as high as 102. Southeast wind 5 to 9 mph.</div>
       </div>
       <div class="period">
-        <div class="period-name">Elev:&nbsp;</div>
-        <div class="period-temp temp-lo"></div>
-        <div class="period-desc"></div>
+        <div class="period-name">Monday Night</div>
+        <div class="period-temp temp-hi">83°F</div>
+        <div class="period-desc">Mostly cloudy, with a low around 83. Southeast wind 5 to 8 mph.</div>
       </div>
       <div class="period">
-        <div class="period-name">Heat Index</div>
-        <div class="period-temp temp-lo"></div>
-        <div class="period-desc"></div>
+        <div class="period-name">Tuesday</div>
+        <div class="period-temp temp-hi">90°F</div>
+        <div class="period-desc">A slight chance of showers and thunderstorms after 2pm. Mostly sunny, with a high near 90. Southeast wind 3 to 9 mph. Chance of precipitation is 20%.</div>
+      </div>
+      <div class="period">
+        <div class="period-name">Tuesday Night</div>
+        <div class="period-temp temp-hi">82°F</div>
+        <div class="period-desc">A slight chance of showers and thunderstorms before 8pm. Partly cloudy, with a low around 82. Southeast wind 5 to 9 mph. Chance of precipitation is 20%.</div>
       </div>
     </div>
     <div class="card-footer">
@@ -591,27 +655,42 @@ footer strong{color:#fff;}
 <div class="status-grid">
   <div class="status-card all-clear">
     <div class="status-title">🌀 Atlantic Tropics Status</div>
-    <div class="status-value">SEE BELOW</div>
-    <div class="status-sub">NHC Tropical Weather Outlook — current as of 03:00 EDT today</div>
+    <div class="status-value">SEE NHC BELOW</div>
+    <div class="status-sub">NHC Tropical Weather Outlook — current as of Sunday, June 21, 2026 · 4:50 PM EDT</div>
   </div>
   <div class="status-card info">
     <div class="status-title">🌊 Gulf Stream</div>
     <div class="status-value">NORMAL</div>
-    <div class="status-sub">No Gulf Stream hazards posted · Position data from Naval Oceanographic Office</div>
+    <div class="status-sub">Position data from NWS Miami (MFL) Coastal Waters Forecast</div>
   </div>
 </div>
 
-<div class="overview-card">
+<div class="nhc-block">
   <h2>🌀 NHC Atlantic Tropical Weather Outlook</h2>
-  <p style="font-size:0.88rem; white-space:pre-wrap; font-family:monospace; color:var(--text);">en Español 000 ABNT20 KNHC 211713 TWOAT Tropical Weather Outlook NWS National Hurricane Center Miami FL 200 PM EDT Sun Jun 21 2026 For the North Atlantic...Caribbean Sea and the Gulf of America: Tropical cyclone formation is not expected during the next 7 days. $$ Forecaster Pasch/Adams</p>
-  <p style="font-size:0.77rem; color:var(--muted); margin-top:8px;">Source: <a href="https://www.nhc.noaa.gov/text/MIATWOAT.shtml" target="_blank">NHC — nhc.noaa.gov</a></p>
+  <div class="nhc-text">en Español
+
+000
+ABNT20 KNHC 211713
+TWOAT 
+
+Tropical Weather Outlook
+NWS National Hurricane Center Miami FL
+200 PM EDT Sun Jun 21 2026
+
+For the North Atlantic...Caribbean Sea and the Gulf of America:
+
+Tropical cyclone formation is not expected during the next 7 days.
+
+$$
+Forecaster Pasch/Adams</div>
+  <p style="font-size:0.77rem;color:var(--muted);margin-top:10px;">Source: <a href="https://www.nhc.noaa.gov/text/MIATWOAT.shtml" target="_blank">NHC — nhc.noaa.gov</a></p>
 </div>
 
 <div class="gulf-stream-box">
   <div class="gs-icon">🌊</div>
   <div>
-    <div class="gs-title">Gulf Stream — West Wall Position · Source: Naval Oceanographic Office via NWS Miami</div>
-    <p style="font-size:0.87rem; margin-bottom:8px; color:#e2e8f0;">The Gulf Stream west wall marks the inshore boundary of the northward-flowing current (avg 2–4 kt). <strong style="color:#7dd3fc;">No Gulf Stream hazards currently posted.</strong></p>
+    <div class="gs-title">Gulf Stream — West Wall Position · Source: NWS Miami (MFL) Coastal Waters Forecast</div>
+    <p style="font-size:0.87rem;margin-bottom:8px;color:#e2e8f0;">The Gulf Stream west wall marks the inshore boundary of the northward-flowing current (avg 2–4 kt). <strong style="color:#7dd3fc;">No Gulf Stream hazards currently posted.</strong></p>
     <div class="gs-positions"><div class="gs-pos"><strong>Fowey Rocks.</strong>15 nautical miles east northeast</div><div class="gs-pos"><strong>Port Everglades.</strong>19 nautical miles southeast</div><div class="gs-pos"><strong>Lake Worth.</strong>22 nautical miles east southeast</div></div>
     <div class="gs-warn">⚠ Winds opposing the Gulf Stream current create steep, confused seas. Avoid strong north winds while transiting. Stream averages 2–4 kt northward flow in this region.</div>
   </div>
