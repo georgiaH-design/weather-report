@@ -97,12 +97,12 @@ def fetch_buoy_full(buoy_id):
 
     def parse_row(row):
         p = row.split()
-        if len(p) < 15:
+        if len(p) < 7:   # need at least through WSPD (col 6)
             return None
-        def v(x): return None if x == 'MM' else x
-        return {"wvht": v(p[8]), "dpd": v(p[9]), "mwd": v(p[11]),
-                "wspd": v(p[6]), "wdir": v(p[5]), "gust": v(p[7]),
-                "pres": v(p[12]), "wtmp": v(p[14])}
+        def v(i): return None if i >= len(p) or p[i] == 'MM' else p[i]
+        return {"wvht": v(8), "dpd": v(9), "mwd": v(11),
+                "wspd": v(6), "wdir": v(5), "gust": v(7),
+                "pres": v(12), "wtmp": v(14)}
 
     cur = parse_row(lines[0])
     if not cur:
@@ -937,17 +937,26 @@ def main():
         bd = fetch_buoy_full(city["buoy"])
         bd["wave_source"] = "primary"
 
-        # ── Wave fallback chain ───────────────────────────────────────────────
-        # Step 1: Try alternate NDBC buoys (for C-MAN stations with no wave sensor)
-        if bd["wvht"] == "N/A" and city.get("wave_buoys"):
+        # ── Fallback chain for all buoy fields ───────────────────────────────
+        # Step 1: Try alternate NDBC buoys for ANY missing data (waves AND met)
+        if city.get("wave_buoys") and (bd["wvht"] == "N/A" or bd["wspd"] == "N/A" or bd["pres"] == "N/A" or bd["wtmp"] == "N/A"):
             for alt_id in city["wave_buoys"]:
-                print(f"    → Wave N/A on {city['buoy']}, trying alt buoy {alt_id}...", file=sys.stderr)
+                print(f"    → Missing data on {city['buoy']}, trying alt buoy {alt_id}...", file=sys.stderr)
                 alt = fetch_buoy_full(alt_id)
-                if alt["wvht"] != "N/A":
+                # Fill in any N/A fields from the alt buoy
+                if bd["wvht"] == "N/A" and alt["wvht"] != "N/A":
                     for k in ["wvht","dpd","mwd","sea_label","sea_cls","trend","trend_label","trend_cls"]:
                         bd[k] = alt[k]
                     bd["wave_source"] = f"buoy:{alt_id}"
-                    print(f"    ✓ Wave data from {alt_id}", file=sys.stderr)
+                if bd["wspd"] == "N/A" and alt["wspd"] != "N/A":
+                    bd["wspd"] = alt["wspd"]
+                if bd["wtmp"] == "N/A" and alt["wtmp"] != "N/A":
+                    bd["wtmp"] = alt["wtmp"]
+                if bd["pres"] == "N/A" and alt["pres"] != "N/A":
+                    bd["pres"] = alt["pres"]
+                print(f"    ✓ Gap-filled from {alt_id}: wave={bd['wvht']} wind={bd['wspd']} wtmp={bd['wtmp']} pres={bd['pres']}", file=sys.stderr)
+                # Stop if all key fields are now filled
+                if bd["wvht"] != "N/A" and bd["wspd"] != "N/A" and bd["wtmp"] != "N/A" and bd["pres"] != "N/A":
                     break
 
         # Step 2: Open-Meteo Marine (free, no key required) — covers any remaining gap
