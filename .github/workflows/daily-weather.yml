@@ -2,8 +2,13 @@ name: Daily Maritime Weather Report
 
 on:
   schedule:
-    # 07:00 UTC = 03:00 EDT (UTC-4) every morning
-    - cron: '0 7 * * *'
+    # Four reports a day: 07:00, 13:00, 19:00 and 01:00 UTC.
+    # Scheduled 8 minutes early and off the hour, because GitHub delays
+    # (and sometimes drops) jobs queued at the top of the hour.
+    - cron: '52 6 * * *'    # 07:00 UTC report
+    - cron: '52 12 * * *'   # 13:00 UTC report
+    - cron: '52 18 * * *'   # 19:00 UTC report
+    - cron: '52 0 * * *'    # 01:00 UTC report
   # Allow manual trigger from GitHub Actions tab
   workflow_dispatch:
 
