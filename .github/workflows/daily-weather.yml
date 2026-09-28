@@ -9,7 +9,7 @@ on:
     - cron: '52 12 * * *'   # 13:00 UTC report
     - cron: '52 18 * * *'   # 19:00 UTC report
     - cron: '52 0 * * *'    # 01:00 UTC report
-  # Allow manual trigger from GitHub Actions tab
+  # Allow manual  trigger from GitHub Actions tab
   workflow_dispatch:
 
 jobs:
