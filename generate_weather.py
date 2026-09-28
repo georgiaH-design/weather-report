@@ -837,7 +837,7 @@ def build_html(city_data, buoy_data, nhc_two, gs_lines):
 <main>
 
 <div class="overview-card">
-  <h2>🗺️ Regional Overview — Next 48 Hours · Generated {today_str} at 03:00 EDT</h2>
+  <h2>🗺️ Regional Overview — Next 48 Hours · Generated {ISSUE_TIME}</h2>
   <div class="overview-grid">
     {overview_html}
   </div>
@@ -919,7 +919,7 @@ def build_html(city_data, buoy_data, nhc_two, gs_lines):
 <footer>
   <p><strong>Captain Georgia</strong> — USCG Master · OICNW · Fort Lauderdale, FL</p>
   <p style="margin-top:6px">Data sourced from <a href="https://www.weather.gov" target="_blank">NOAA National Weather Service</a> &amp; <a href="https://www.nhc.noaa.gov" target="_blank">National Hurricane Center</a></p>
-  <p style="margin-top:4px">Auto-generated daily at 03:00 EDT · Always consult official NWS products and VHF WX radio before underway · <a href="https://captaingeorgia.com" target="_blank">captaingeorgia.com</a></p>
+  <p style="margin-top:4px">Auto-generated 4× daily · 07:00, 13:00, 19:00 &amp; 01:00 UTC · Always consult official NWS products and VHF WX radio before underway · <a href="https://captaingeorgia.com" target="_blank">captaingeorgia.com</a></p>
 </footer>
 </body>
 </html>"""
@@ -997,3 +997,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
